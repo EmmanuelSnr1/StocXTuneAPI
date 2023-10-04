@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Created-By: IntelliJ IDEA
+Built-By: emmanuel
+Build-Jdk: GraalVM version 17.0.8
+Implementation-Title: Stock market portfolio Management backend
+Implementation-Version: 0.0.1-SNAPSHOT
+Implementation-Vendor-Id: com.example
+Main-Class: ${start-class}
+
