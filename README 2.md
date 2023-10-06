@@ -1,5 +1,5 @@
-# stock-portfolio-management
-Complete backend as a REST API for a stock-market portfolio management application, with proper authentication, login/ logout system, live stock prices, etc.
+# asset-portfolio-management
+Complete backend as a REST API for a asset-market portfolio management application, with proper authentication, login/ logout system, live asset prices, etc.
 
 Technologies:
 

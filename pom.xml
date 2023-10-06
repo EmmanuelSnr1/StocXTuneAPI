@@ -11,13 +11,13 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.example</groupId>
+    <groupId>com.stocxtune</groupId>
     <artifactId>smpm-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
     <name>Stock market portfolio Management backend</name>
 
-    <description> Complete backend as a REST API for a stock-market portfolio management application, with proper authentication, login/ logout system, live stock prices, etc. </description>
+    <description> Complete backend as a REST API for a asset-market portfolio management application, with proper authentication, login/ logout system, live asset prices, etc. </description>
 
     <properties>
         <java.version>17</java.version>

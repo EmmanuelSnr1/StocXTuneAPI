@@ -1,2 +1,2 @@
-cd stock-portfolio-management-frontend
+cd asset-portfolio-management-frontend
 npm start
