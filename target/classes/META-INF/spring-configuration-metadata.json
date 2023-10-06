@@ -2,15 +2,15 @@
   "groups": [
     {
       "name": "api",
-      "type": "com.example.stockapi.config.StockApiConfig",
-      "sourceType": "com.example.stockapi.config.StockApiConfig"
+      "type": "com.stocxtune.api.config.StockApiConfig",
+      "sourceType": "com.stocxtune.api.config.StockApiConfig"
     }
   ],
   "properties": [
     {
       "name": "api.a-p-i-k-e-y",
       "type": "java.lang.String",
-      "sourceType": "com.example.stockapi.config.StockApiConfig"
+      "sourceType": "com.stocxtune.api.config.StockApiConfig"
     }
   ],
   "hints": []
