@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.stocxtune.api.AssetApiApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.367 s - in com.stocxtune.api.AssetApiApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 7.682 s - in com.stocxtune.api.AssetApiApplicationTests

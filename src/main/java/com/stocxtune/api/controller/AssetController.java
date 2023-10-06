@@ -1,9 +1,9 @@
 package com.stocxtune.api.controller;
 
-import com.stocxtune.api.model.stock.Asset;
-import com.stocxtune.api.repository.StockDataRepo;
 import com.stocxtune.api.exception.ApiException;
+import com.stocxtune.api.model.stock.Asset;
 import com.stocxtune.api.model.stock.StockSearchResult;
+import com.stocxtune.api.repository.StockDataRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/stocks")
+@RequestMapping("/api/assets")
 public class AssetController {
 
     // Used to fetch Data from the API and then convert it to a preferred format

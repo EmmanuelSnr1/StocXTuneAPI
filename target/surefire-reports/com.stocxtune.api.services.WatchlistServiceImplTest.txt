@@ -1,4 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: com.stocxtune.api.services.WatchlistServiceImplTest
 -------------------------------------------------------------------------------
-Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.16 s - in com.stocxtune.api.services.WatchlistServiceImplTest
+Tests run: 2, Failures: 0, Errors: 1, Skipped: 0, Time elapsed: 0.15 s <<< FAILURE! - in com.stocxtune.api.services.WatchlistServiceImplTest
+testSaveWatchlist  Time elapsed: 0.142 s  <<< ERROR!
+java.lang.NullPointerException: name is marked non-null but is null
+	at com.stocxtune.api.services.WatchlistServiceImplTest.testSaveWatchlist(WatchlistServiceImplTest.java:43)
+

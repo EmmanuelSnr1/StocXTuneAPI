@@ -1,2 +1,0 @@
-# StocXTuneAPI
-Spring backend
