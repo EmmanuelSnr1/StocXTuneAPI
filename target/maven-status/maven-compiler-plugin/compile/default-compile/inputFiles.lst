@@ -13,6 +13,7 @@
 /Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/security/services/UserDetailsServiceImpl.java
 /Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/model/stock/StockSearchResult.java
 /Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/dto/StockDTO.java
+/Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/service/YahooFinanceService.java
 /Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/StockApiApplication.java
 /Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/exception/ApiException.java
 /Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/service/impl/StockServiceImpl.java
@@ -31,7 +32,9 @@
 /Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/dao/WatchlistDAO.java
 /Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/security/jwt/JwtUtils.java
 /Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/model/Investment.java
+/Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/dto/SymbolDTO.java
 /Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/model/stock/Stock.java
+/Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/controller/SymbolController.java
 /Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/model/User.java
 /Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/model/Watchlist.java
 /Users/emmanuel/IdeaProjects/StocXTuneAPI/src/main/java/com/stocxtune/api/service/impl/WatchlistServiceImpl.java

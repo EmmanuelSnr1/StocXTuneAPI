@@ -3,6 +3,7 @@ com/stocxtune/api/dao/AssetDAO.class
 com/stocxtune/api/service/StockService.class
 com/stocxtune/api/controller/WatchlistController.class
 com/stocxtune/api/service/impl/StockServiceImpl.class
+com/stocxtune/api/controller/SymbolController.class
 com/stocxtune/api/dao/WatchlistDAO.class
 com/stocxtune/api/repository/StockDataRepo.class
 com/stocxtune/api/repository/StockRepository.class
@@ -16,6 +17,7 @@ com/stocxtune/api/repository/WatchlistRepository.class
 com/stocxtune/api/dao/InvestmentDao.class
 com/stocxtune/api/model/role/ERole.class
 com/stocxtune/api/dao/StockDAO.class
+com/stocxtune/api/service/YahooFinanceService.class
 com/stocxtune/api/StockApiApplication.class
 com/stocxtune/api/config/StockApiConfig.class
 com/stocxtune/api/model/Investment.class
@@ -24,6 +26,7 @@ com/stocxtune/api/security/WebSecurityConfig.class
 com/stocxtune/api/model/stock/Stock.class
 com/stocxtune/api/security/jwt/AuthTokenFilter.class
 com/stocxtune/api/controller/UserController.class
+com/stocxtune/api/dto/SymbolDTO.class
 com/stocxtune/api/dao/UserDao.class
 com/stocxtune/api/dao/RoleDao.class
 com/stocxtune/api/model/User.class
