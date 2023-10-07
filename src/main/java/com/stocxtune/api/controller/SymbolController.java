@@ -57,10 +57,20 @@ public class SymbolController {
         String response = yahooFinanceService.fetchKeyFinancials(symbol);
         return ResponseEntity.ok(response);
     }
+    @GetMapping("/{symbol}/key-stats") //Passed
+    public ResponseEntity<String> fetchKeyStats(@PathVariable String symbol) {
+        String response = yahooFinanceService.fetchKeyStats(symbol);
+        return ResponseEntity.ok(response);
+    }
 
     @GetMapping("/{symbol}/logo") //Passed
     public ResponseEntity<String> fetchCompanyLogo(@PathVariable String symbol) {
         String response = twelveDataService.fetchCompanyLogo(symbol);
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/{symbol}/fundamentals") //Passed
+    public ResponseEntity<String> fetchCompanyFundamentals(@PathVariable String symbol) {
+        String response = twelveDataService.fetchCompanyFundamentals(symbol);
         return ResponseEntity.ok(response);
     }
 
@@ -84,6 +94,24 @@ public class SymbolController {
     @GetMapping("/{symbol}/news")
     public ResponseEntity<String> fetchStockNews(@PathVariable String symbol) {
         String response = yahooFinanceService.fetchStockNews(symbol);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/market-actives")
+    public ResponseEntity<String> fetchMarketActives() {
+        String response = yahooFinanceService.fetchMarketActives();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/day-losers")
+    public ResponseEntity<String> fetchDayLosers() {
+        String response = yahooFinanceService.fetchDayLosers();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/day-gainers")
+    public ResponseEntity<String> fetchDayGainers() {
+        String response = yahooFinanceService.fetchDayGainers();
         return ResponseEntity.ok(response);
     }
 }

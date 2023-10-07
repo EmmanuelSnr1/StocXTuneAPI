@@ -6,53 +6,85 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 import org.springframework.stereotype.Service;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 @Service
 public class YahooFinanceService {
 
     private static final String YAHOO_BASE_URL = "https://yahoo-finance15.p.rapidapi.com/api/yahoo/";
-    private static final String API_KEY = "d75e476636msha08ea07fdb84f37p11a6ccjsnf6345c38ebe8";
+    private static final String API_KEY = "03e1e97663msh35f5cc76e6b5ce5p11427fjsn835e3d542999";
 
+    @Cacheable(value = "symbols")
     public String searchSymbols(String fragment) {
         return fetchData(YAHOO_BASE_URL + "sc/search/" + fragment);
     }
 
+    @Cacheable(value = "companyProfiles")
     public String fetchCompanyProfile(String symbol) {
         return fetchData(YAHOO_BASE_URL + "qu/quote/" + symbol + "/asset-profile");
     }
 
+    @Cacheable(value = "institutionOwnerships")
     public String fetchInstitutionOwnership(String symbol) {
         return fetchData(YAHOO_BASE_URL + "qu/quote/" + symbol + "/institution-ownership");
     }
 
+    @Cacheable(value = "secFilings")
     public String fetchSECFilings(String symbol) {
         return fetchData(YAHOO_BASE_URL + "qu/quote/" + symbol + "/sec-filings");
     }
-
+    @Cacheable(value = "insiderHoldings")
     public String fetchInsiderHoldings(String symbol) {
         return fetchData(YAHOO_BASE_URL + "qu/quote/" + symbol + "/insider-holders");
     }
 
+    @Cacheable(value = "keyFinancials")
     public String fetchKeyFinancials(String symbol) {
         return fetchData(YAHOO_BASE_URL + "qu/quote/" + symbol + "/financial-data");
     }
+    @Cacheable(value = "keyStats")
+    public String fetchKeyStats(String symbol) {
+        return fetchData(YAHOO_BASE_URL + "qu/quote/" + symbol + "/default-key-statistics");
+    }
+    @Cacheable(value = "stockNews")
     public String fetchStockNews(String symbol) {
         String url = YAHOO_BASE_URL + "ne/news/" + symbol;
         return fetchData(url);
     }
+
+    @Cacheable(value = "marketNews")
     public String fetchMarketNews() {
         String url = YAHOO_BASE_URL + "ne/news";
         return fetchData(url);
     }
 
+    @Cacheable(value = "marketInsiderTrades")
     public String fetchMarketInsiderTrades() {
         String url = YAHOO_BASE_URL + "v1/sec/form4";
         return fetchData(url);
     }
 
+    @Cacheable(value = "timeSeriesData")
     public String fetchTimeSeriesData(String symbol, String interval) {
         validateInterval(interval);
         return fetchData(YAHOO_BASE_URL + "hi/history/" + symbol + "/" + interval + "?diffandsplits=false");
+    }
+
+
+    @Cacheable(value = "marketActives")
+    public String fetchMarketActives() {
+        return fetchData(YAHOO_BASE_URL + "co/collections/most_actives");
+    }
+
+    @Cacheable(value = "marketLosers")
+    public String fetchDayLosers() {
+        return fetchData(YAHOO_BASE_URL + "co/collections/day_losers");
+    }
+
+    @Cacheable(value = "marketGainers")
+    public String fetchDayGainers() {
+        return fetchData(YAHOO_BASE_URL + "co/collections/day_gainers");
     }
 
     private void validateInterval(String interval) {
