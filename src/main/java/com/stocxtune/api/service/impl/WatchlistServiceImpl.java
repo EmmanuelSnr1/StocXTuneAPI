@@ -9,6 +9,8 @@ import com.stocxtune.api.repository.WatchlistRepository;
 import com.stocxtune.api.model.Watchlist;
 import com.stocxtune.api.service.WatchlistService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import com.stocxtune.api.service.YahooFinanceService;
+import com.stocxtune.api.service.TwelveDataService;
+
+
 
 
 //If you take a look at an entity above you can see they reflect a model for our domain or business logic in the application.
@@ -26,14 +32,23 @@ import java.util.stream.Collectors;
 @Service
 public class WatchlistServiceImpl implements WatchlistService {
 
+    @Autowired
+    private YahooFinanceService yahooFinanceService;
+
+    @Autowired
+    private TwelveDataService twelveDataService ;
+
+
 
     @Autowired
     private WatchlistRepository watchlistRepository;
 
     private static final Logger logger = LoggerFactory.getLogger(WatchlistServiceImpl.class);
+
     @Autowired
     private UserDao userDao;
 
+    //Add Validations to check if A duplicate symbol is found.
     @Override
     @Transactional
     public WatchlistDTO save(WatchlistDTO watchlistDTO) {
@@ -117,7 +132,34 @@ public class WatchlistServiceImpl implements WatchlistService {
                         stockDTO.setSymbol(stock.getSymbol());
                         stockDTO.setName(stock.getName());
                         // Set other attributes from stock to stockDTO here...
+                        // Fetch key financials for the stock
+                        String financialDataJson = twelveDataService.fetchCompanyFundamentals(stock.getSymbol());
+                        try {
+                            JSONObject financialData = new JSONObject(financialDataJson);
+
+                            // Extracting current price
+                            if (financialData.has("close")) {
+                                stockDTO.setCurrentPrice(financialData.getDouble("close"));
+                            }
+
+                            // Extracting percentage change
+                            if (financialData.has("percent_change")) {
+                                stockDTO.setPercentageChange(financialData.getDouble("percent_change"));
+                            }
+
+                            // You can add other attributes extraction here as needed...
+
+                        } catch (JSONException e) {
+                            // Log the error or handle it as appropriate
+                            System.err.println("Error parsing JSON for stock: " + stock.getSymbol());
+                            e.printStackTrace();
+                        }
+
+                        logger.info(" Converted Watchlist : {}", stockDTO);
+
                         return stockDTO;
+
+
                     })
                     .collect(Collectors.toList());
             dto.setStocks(stockDTOs);

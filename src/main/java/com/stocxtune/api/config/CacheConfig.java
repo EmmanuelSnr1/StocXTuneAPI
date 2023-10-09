@@ -30,7 +30,13 @@ public class CacheConfig {
                 "marketLosers",
                 "marketGainers",
                 "companyFundamentals",
-                "companyLogos"
+                "companyLogos",
+                "findWatchlistByID",
+                "findAllWatchlist",
+                "findWatchlistByUserID",
+                "updateWatchlist",
+                "deleteWatchlist",
+                "saveWatchlist"
         );
     }
 
