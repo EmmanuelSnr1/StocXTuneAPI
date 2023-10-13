@@ -15,9 +15,14 @@ public interface WatchlistService {
     @Cacheable(value = "findWatchlistByUserID")
     List<WatchlistDTO> findAllByUserId(Long userId);
 
+    @Cacheable(value = "getWatchlistByUserEmail")
+    List<WatchlistDTO> getWatchlistByUserEmail(String email);
+
     @Cacheable(value = "updateWatchlist")
     WatchlistDTO update(Long id, WatchlistDTO watchlistDTO );
     @Cacheable(value = "deleteWatchlist")
     void deleteById(Long id);
+
+
     // Other CRUD operations...
 }

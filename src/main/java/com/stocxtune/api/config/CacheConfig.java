@@ -36,7 +36,8 @@ public class CacheConfig {
                 "findWatchlistByUserID",
                 "updateWatchlist",
                 "deleteWatchlist",
-                "saveWatchlist"
+                "saveWatchlist",
+                "getWatchlistByUserEmail"
         );
     }
 

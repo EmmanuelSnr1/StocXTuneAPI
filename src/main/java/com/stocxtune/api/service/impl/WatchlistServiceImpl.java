@@ -59,12 +59,9 @@ public class WatchlistServiceImpl implements WatchlistService {
         watchlist.setDescription(watchlistDTO.getDescription());
 
         // Using UserDao to fetch the User entity using the email
-        User user = userDao.getUserByEmail(watchlistDTO.getUserEmail())
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + watchlistDTO.getUserEmail()));
+        User user = userDao.getUserByEmail(watchlistDTO.getUser())
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + watchlistDTO.getUser()));
         watchlist.setUser(user);
-
-
-
         // Convert StockDTOs to Stock entities
         if (watchlistDTO.getStocks() != null && !watchlistDTO.getStocks().isEmpty()) {
             List<Stock> stocks = watchlistDTO.getStocks().stream()
@@ -85,10 +82,19 @@ public class WatchlistServiceImpl implements WatchlistService {
     }
 
 
+    // returns all the watchlists in the database.
     @Override
     public WatchlistDTO findById(Long id) {
         Optional<Watchlist> watchlist = watchlistRepository.findById(id);
         return watchlist.map(this::convertToDTO).orElse(null);
+    }
+
+    public List<WatchlistDTO> getWatchlistByUserEmail(String email) {
+        List<Watchlist> watchlist = watchlistRepository.findByUser_Email(email);
+        // Convert the list of Watchlist entities to WatchlistDTOs and return
+        return watchlist.stream()
+                .map(this::convertToDTO)  // Assuming you have a method called convertToDTO
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -100,8 +106,10 @@ public class WatchlistServiceImpl implements WatchlistService {
 
     @Override
     public List<WatchlistDTO> findAllByUserId(Long userId) {
-        return watchlistRepository.findByUserId(userId).stream()
-                .map(this::convertToDTO)
+        List<Watchlist> watchlist = watchlistRepository.findByUserId(userId);
+
+        return watchlist.stream()
+                .map(this::convertToDTO)  // Assuming you have a method called convertToDTO
                 .collect(Collectors.toList());
     }
 
@@ -120,7 +128,7 @@ public class WatchlistServiceImpl implements WatchlistService {
 
         // Set the userEmail from the User entity associated with the watchlist
         if (watchlist.getUser() != null) {
-            dto.setUserEmail(watchlist.getUser().getEmail()); // Updated this line
+            dto.setUser(watchlist.getUser().getEmail()); // Updated this line
         }
 
         // Convert Stock entities to StockDTOs
@@ -234,20 +242,6 @@ public class WatchlistServiceImpl implements WatchlistService {
                 })
                 .collect(Collectors.toList());
     }
-
-
-
-
-    //Exception to be used to be used when saving duplicate symbols.
-//    try {
-//        // Code that triggers the exception, e.g., saving a stock
-//        stockRepository.save(stock);
-//    } catch (DataIntegrityViolationException e) {
-//        if (e.getCause() instanceof SQLIntegrityConstraintViolationException) {
-//            throw new RuntimeException("The stock symbol 'AAPL' already exists. Please choose a different symbol.");
-//        }
-//        throw e; // rethrow the original exception if it's not the one we're looking for
-//    }
 
 
 

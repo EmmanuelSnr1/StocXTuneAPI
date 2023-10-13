@@ -19,7 +19,7 @@ public class Stock {
     private Long id;
 
     @NonNull
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     private String symbol;
 
     @NonNull

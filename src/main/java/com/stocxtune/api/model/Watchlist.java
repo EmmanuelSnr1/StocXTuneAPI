@@ -24,8 +24,9 @@ public class Watchlist {
 
     private String description;
 
+
     @ManyToOne
-    @JoinColumn(name = "user_email")
+    @JoinColumn(name = "user")
     private User user;
 
     @ManyToMany(cascade = CascadeType.ALL)
