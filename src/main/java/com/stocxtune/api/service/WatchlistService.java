@@ -1,5 +1,6 @@
 package com.stocxtune.api.service;
 
+import com.stocxtune.api.dto.StockDTO;
 import com.stocxtune.api.dto.WatchlistDTO;
 import org.springframework.cache.annotation.Cacheable;
 
@@ -22,6 +23,14 @@ public interface WatchlistService {
     WatchlistDTO update(Long id, WatchlistDTO watchlistDTO );
     @Cacheable(value = "deleteWatchlist")
     void deleteById(Long id);
+
+    WatchlistDTO updateDetails(Long id, WatchlistDTO watchlistDTO);
+
+    WatchlistDTO addStocks(Long id, List<StockDTO> stocks);
+
+    WatchlistDTO removeStocks(Long id, List<Long> stockIds);
+
+//    WatchlistDTO updateStocks(Long id, List<StockDTO> stocks);
 
 
     // Other CRUD operations...

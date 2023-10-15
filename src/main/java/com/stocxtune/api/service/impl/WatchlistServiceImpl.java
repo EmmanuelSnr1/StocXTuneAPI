@@ -176,6 +176,48 @@ public class WatchlistServiceImpl implements WatchlistService {
         return dto;
     }
 
+    public WatchlistDTO updateDetails(Long id, WatchlistDTO watchlistDTO) {
+        Watchlist watchlist = watchlistRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Watchlist not found with ID: " + id));
+
+        if (watchlistDTO.getName() != null) {
+            watchlist.setName(watchlistDTO.getName());
+        }
+
+        if (watchlistDTO.getDescription() != null) {
+            watchlist.setDescription(watchlistDTO.getDescription());
+        }
+
+        watchlistRepository.save(watchlist);
+        return convertToDTO(watchlist);
+    }
+
+    public WatchlistDTO addStocks(Long id, List<StockDTO> stocks) {
+        Watchlist watchlist = watchlistRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Watchlist not found with ID: " + id));
+
+        List<Stock> newStocks = convertDTOsToStocks(stocks);
+        watchlist.getStocks().addAll(newStocks);
+
+        watchlistRepository.save(watchlist);
+        return convertToDTO(watchlist);
+    }
+
+    public WatchlistDTO removeStocks(Long id, List<Long> stockIds) {
+        Watchlist watchlist = watchlistRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Watchlist not found with ID: " + id));
+
+        watchlist.getStocks().removeIf(stock -> stockIds.contains(stock.getId()));
+
+        watchlistRepository.save(watchlist);
+        return convertToDTO(watchlist);
+    }
+
+//    public WatchlistDTO updateStocks(Long id, List<StockDTO> stocks) {
+//        // Implement the logic to update stock symbols
+//        // Similar to the logic you provided in the initial update method
+//    }
+
     public WatchlistDTO update(Long id, WatchlistDTO watchlistDTO) {
         Watchlist watchlist = watchlistRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Watchlist not found with ID: " + id));
@@ -237,11 +279,34 @@ public class WatchlistServiceImpl implements WatchlistService {
                     stock.setId(stockDTO.getId());
                     stock.setSymbol(stockDTO.getSymbol());
                     stock.setName(stockDTO.getName());
-                    // Set other attributes from stockDTO to stock here...
+                    // Fetch key financials for the stock
+                    String financialDataJson = twelveDataService.fetchCompanyFundamentals(stock.getSymbol());
+                    try {
+                        JSONObject financialData = new JSONObject(financialDataJson);
+
+                        // Extracting current price
+                        if (financialData.has("close")) {
+                            stock.setCurrentPrice(financialData.getDouble("close"));
+                        }
+
+                        // Extracting percentage change
+                        if (financialData.has("percent_change")) {
+                            // Assuming you have a setPercentageChange method in the Stock entity
+                            stock.setPercentageChange(financialData.getDouble("percent_change"));
+                        }
+
+                    // You can add other attributes extraction here as needed...
+                    } catch (JSONException e) {
+                        // Log the error or handle it as appropriate
+                        System.err.println("Error parsing JSON for stock: " + stock.getSymbol());
+                        e.printStackTrace();
+                    }
+
                     return stock;
                 })
                 .collect(Collectors.toList());
     }
+
 
 
 

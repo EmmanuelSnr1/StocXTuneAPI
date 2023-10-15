@@ -1,6 +1,7 @@
 package com.stocxtune.api.controller;
 
 import com.stocxtune.api.dao.UserDao;
+import com.stocxtune.api.dto.StockDTO;
 import com.stocxtune.api.dto.WatchlistDTO;
 import com.stocxtune.api.model.User;
 import com.stocxtune.api.security.services.UserDetailsImpl;
@@ -89,6 +90,26 @@ public class WatchlistController {
         watchlistDTO.setUser(email); // Updated this line
         return watchlistService.update(id, watchlistDTO);
     }
+
+    @PutMapping("/{id}/details")
+    public WatchlistDTO updateWatchlistDetails(@PathVariable Long id, @RequestBody WatchlistDTO watchlistDTO) {
+        return watchlistService.updateDetails(id, watchlistDTO);
+    }
+
+    @PostMapping("/{id}/stocks")
+    public WatchlistDTO addStocksToWatchlist(@PathVariable Long id, @RequestBody List<StockDTO> stocks) {
+        return watchlistService.addStocks(id, stocks);
+    }
+
+    @DeleteMapping("/{id}/stocks")
+    public WatchlistDTO removeStocksFromWatchlist(@PathVariable Long id, @RequestBody List<Long> stockIds) {
+        return watchlistService.removeStocks(id, stockIds);
+    }
+
+//    @PutMapping("/{id}/stocks")
+//    public WatchlistDTO updateStockSymbols(@PathVariable Long id, @RequestBody List<StockDTO> stocks) {
+//        return watchlistService.updateStocks(id, stocks);
+//    }
 
 
 
