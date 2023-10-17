@@ -27,7 +27,6 @@ public class TwelveDataService {
         return fetchData(url);
     }
 
-
     private String fetchData(String url) {
         HttpRequest request = buildRequest(url);
         return executeRequest(request);

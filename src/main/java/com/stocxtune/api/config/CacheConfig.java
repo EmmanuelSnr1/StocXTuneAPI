@@ -33,7 +33,7 @@ public class CacheConfig {
                 "companyLogos",
                 "findWatchlistByID",
                 "findAllWatchlist",
-                "findWatchlistByUserID",
+//                "findWatchlistByUserID",
                 "updateWatchlist",
                 "deleteWatchlist",
                 "saveWatchlist",

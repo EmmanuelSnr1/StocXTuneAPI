@@ -13,7 +13,7 @@ public interface WatchlistService {
     WatchlistDTO findById(Long id);
     @Cacheable(value = "findAllWatchlist")
     List<WatchlistDTO> findAll();
-    @Cacheable(value = "findWatchlistByUserID")
+//    @Cacheable(value = "findWatchlistByUserID")
     List<WatchlistDTO> findAllByUserId(Long userId);
 
     @Cacheable(value = "getWatchlistByUserEmail")

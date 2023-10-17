@@ -199,7 +199,7 @@ public class WatchlistServiceImpl implements WatchlistService {
         List<Stock> newStocks = convertDTOsToStocks(stocks);
         watchlist.getStocks().addAll(newStocks);
 
-        watchlistRepository.save(watchlist);
+         watchlistRepository.save(watchlist);
         return convertToDTO(watchlist);
     }
 
