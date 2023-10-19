@@ -48,7 +48,6 @@ public class WatchlistServiceImpl implements WatchlistService {
     @Autowired
     private UserDao userDao;
 
-    //Add Validations to check if A duplicate symbol is found.
     @Override
     @Transactional
     public WatchlistDTO save(WatchlistDTO watchlistDTO) {
@@ -261,8 +260,6 @@ public class WatchlistServiceImpl implements WatchlistService {
             existingStocks.addAll(stocksToAdd);
             existingStocks.removeAll(stocksToRemove);
         }
-
-
 
         watchlistRepository.save(watchlist);
         return convertToDTO(watchlist);
