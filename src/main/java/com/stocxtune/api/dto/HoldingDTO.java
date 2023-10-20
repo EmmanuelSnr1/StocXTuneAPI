@@ -1,18 +1,21 @@
 package com.stocxtune.api.dto;
 
-import com.stocxtune.api.model.Portfolio;
-import com.stocxtune.api.model.stock.Stock;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
 
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class HoldingDTO {
+
     private Long id;
-    private Stock stock;
-    private Portfolio portfolio;
+    private StockDTO stock;
+    private String symbol;
     private Double quantity;
     private Double averagePrice;
 
-
+    // Other attributes as needed...
 }

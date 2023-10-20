@@ -5,25 +5,29 @@ import lombok.*;
 
 import javax.persistence.*;
 
+@Entity
+@Table(name = "holdings")
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
-@Entity
-@Table(name = "holdings")
 public class Holding {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String symbol;
+
+    @ManyToOne
+    @JoinTable(name = "holding_stocks",
+            joinColumns = @JoinColumn(name = "holding_id"),
+            inverseJoinColumns = @JoinColumn(name = "stock_id"))
+    private Stock stock;
+
     @ManyToOne
     @JoinColumn(name = "portfolio_id")
     private Portfolio portfolio;
-
-    @ManyToOne
-    @JoinColumn(name = "stock_id")
-    private Stock stock;
 
     private Double quantity;
 
@@ -31,3 +35,5 @@ public class Holding {
 
     // Other attributes as needed...
 }
+
+

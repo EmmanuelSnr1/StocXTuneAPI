@@ -12,6 +12,9 @@ public interface StockRepository extends JpaRepository<Stock, Long> {
     // Custom query to find a stock by its symbol.
     Stock findBySymbol(String symbol);
 
+    List<Stock> findAllBySymbol(String symbol);
+
+
     // Custom query to find stocks by their name (could return multiple stocks with similar names).
     List<Stock> findByNameContaining(String name);
 

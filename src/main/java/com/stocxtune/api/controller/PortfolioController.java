@@ -42,7 +42,7 @@ public class PortfolioController {
                 .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
 
         // Set the userEmail in the WatchlistDTO
-        portfolioDTO.setUser(email); // Updated this line
+        portfolioDTO.setUserId(userId); // Updated this line
         return ResponseEntity.ok(portfolioService.save(portfolioDTO));
     }
 

@@ -8,19 +8,25 @@ import java.util.Date;
 import com.stocxtune.api.enums.TransactionEnums.AssetType;
 import com.stocxtune.api.enums.TransactionEnums.TransactionType;
 
-
-
+@Entity
+@Table(name = "transactions")
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
-@Entity
-@Table(name = "transactions")
 public class Transaction {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String symbol; // Added symbol field
+
+    @ManyToOne
+    @JoinTable(name = "transaction_stocks",
+            joinColumns = @JoinColumn(name = "transaction_id"),
+            inverseJoinColumns = @JoinColumn(name = "stock_id"))
+    private Stock stock;
 
     @ManyToOne
     @JoinColumn(name = "portfolio_id")
@@ -28,11 +34,6 @@ public class Transaction {
 
     @Enumerated(EnumType.STRING)
     private AssetType assetType;
-
-
-    @ManyToOne
-    @JoinColumn(name = "stock_id")
-    private Stock stock;
 
     @Temporal(TemporalType.DATE)
     private Date date;
@@ -46,7 +47,10 @@ public class Transaction {
 
     private Double fees;
 
+    private String accountInfo;
+
     // Other attributes as needed...
 }
+
 
 

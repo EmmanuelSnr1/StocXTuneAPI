@@ -10,9 +10,11 @@ import com.stocxtune.api.model.stock.Stock;
 import com.stocxtune.api.enums.TransactionEnums.AssetType;
 import com.stocxtune.api.enums.TransactionEnums.TransactionType;
 
+import com.stocxtune.api.repository.HoldingRepository;
 import com.stocxtune.api.repository.PortfolioRepository;
 import com.stocxtune.api.repository.StockRepository;
 
+import com.stocxtune.api.repository.TransactionRepository;
 import com.stocxtune.api.service.PortfolioService;
 import com.stocxtune.api.service.TwelveDataService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,12 @@ public class PortfolioServiceImpl implements PortfolioService {
     private PortfolioRepository portfolioRepository;
     @Autowired
     private StockRepository stockRepository;
+    @Autowired
+    private TransactionRepository transactionRepository;
+    @Autowired
+    private HoldingRepository holdingRepository;
+
+
 
     @Autowired
     private TwelveDataService twelveDataService ;
@@ -47,84 +55,224 @@ public class PortfolioServiceImpl implements PortfolioService {
     @Override
     @Transactional
     public PortfolioDTO save(PortfolioDTO portfolioDTO) {
+        // Create a new Portfolio entity
         Portfolio portfolio = new Portfolio();
 
-        // Convert portfolioDTO to portfolio entity and set attributes
+        // Set the name and description from the DTO
         portfolio.setName(portfolioDTO.getName());
         portfolio.setDescription(portfolioDTO.getDescription());
 
-        // Using UserDao to fetch the User entity using the email
-        User user = userDao.getUserByEmail(portfolioDTO.getUser())
-                .orElseThrow(() -> new RuntimeException("User not found with ID: " + portfolioDTO.getUser()));
+        // Fetch the user by email and set it to the portfolio
+        User user = userDao.getUserById(portfolioDTO.getUserId())
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + portfolioDTO.getUserId()));
         portfolio.setUser(user);
 
-//        // Convert TransactionDTOs to Transaction entities
-//        if (portfolioDTO.getTransactions() != null && !portfolioDTO.getTransactions().isEmpty()) {
-//            List<Transaction> transactions = portfolioDTO.getTransactions().stream()
-//                    .map(transactionDTO -> {
-//                        Transaction transaction = new Transaction();
-////                        transaction.setStock(transactionDTO.getSymbol());
-//                        transaction.setDate(transactionDTO.getDate());
-//                        transaction.setShares(transactionDTO.getShares());
-//                        transaction.setPrice(transactionDTO.getPrice());
-//                        transaction.setFees(transactionDTO.getFees());
-//                        // Set other transaction attributes from transactionDTO here...
-//                        return transaction;
-//                    })
-//                    .collect(Collectors.toList());
-//            portfolio.setTransactions(transactions);
-//        }
-//
-//        // Similarly, you can convert other DTOs like HoldingDTO to Holding entities and set them to the portfolio
-//        if (portfolioDTO.getHoldings() != null && !portfolioDTO.getHoldings().isEmpty()){
-//            List<Holding> holdings = portfolioDTO.getHoldings().stream()
-//                    .map(holdingDTO -> {
-//                        Holding holding = new Holding();
-//                        holding.setPortfolio(holdingDTO.getPortfolio());
-//                        holding.setQuantity(holdingDTO.getQuantity());
-//                        holding.setStock(holdingDTO.getStock());
-//                        holding.setAveragePrice(holdingDTO.getAveragePrice());
-//                        return holding;
-//                    })
-//                    .collect(Collectors.toList());
-//            portfolio.setHoldings(holdings);
-//        }
+        // Save the portfolio entity
+        Portfolio savedPortfolio = portfolioRepository.save(portfolio);
+
+        // Convert the saved portfolio entity to DTO and return
+        PortfolioDTO savedPortfolioDTO = new PortfolioDTO();
+        savedPortfolioDTO.setId(savedPortfolio.getId());
+        savedPortfolioDTO.setName(savedPortfolio.getName());
+        savedPortfolioDTO.setDescription(savedPortfolio.getDescription());
+        savedPortfolioDTO.setUserId(savedPortfolio.getUser().getId());
+
+        return savedPortfolioDTO;
+    }
+
+    @Override
+    @Transactional
+    public PortfolioDTO addTransactions(Long portfolioId, List<TransactionDTO> transactionDTOs) {
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found with ID: " + portfolioId));
+
+        List<Transaction> newTransactions = convertDTOsToTransactions(transactionDTOs);
+        portfolio.getTransactions().addAll(newTransactions);
 
 
-        portfolio = portfolioRepository.save(portfolio);
-        logger.info("Saved portfolio: {}", portfolio);
+//            List<Holding> newHoldings = convertTransactionDTOsToHoldings(transactionDTOs);
+//            portfolio.getHoldings().addAll(newHoldings);
+
+
+        // Convert the updated portfolio to DTO and return
+        portfolioRepository.save(portfolio);
         return convertToDTO(portfolio);
     }
+    private List<Transaction> convertDTOsToTransactions(List<TransactionDTO> transactionDTOs) {
+        if (transactionDTOs == null) {
+            return Collections.emptyList();
+        }
+
+        return transactionDTOs.stream()
+                .map(transactionDTO -> {
+                    Transaction transaction = new Transaction();
+                    transaction.setId(transactionDTO.getId());
+                    transaction.setDate(transactionDTO.getDate());
+                    transaction.setSymbol(transactionDTO.getSymbol());
+                    transaction.setShares(transactionDTO.getShares());
+                    transaction.setPrice(transactionDTO.getPrice());
+                    transaction.setFees(transactionDTO.getFees());
+
+                    // Convert string representation of enums to actual enum values
+                    if (transactionDTO.getAssetType() != null) {
+                        transaction.setAssetType(AssetType.valueOf(transactionDTO.getAssetType()));
+                    }
+                    if (transactionDTO.getTransactionType() != null) {
+                        transaction.setTransactionType(TransactionType.valueOf(transactionDTO.getTransactionType()));
+                    }
+
+                    return transaction;
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<Holding> convertTransactionDTOsToHoldings(List<TransactionDTO> transactionDTOs) {
+        if (transactionDTOs == null) {
+            return Collections.emptyList();
+        }
+
+        // Use a map to group transactions by symbol
+        Map<String, List<TransactionDTO>> groupedTransactions = transactionDTOs.stream()
+                .collect(Collectors.groupingBy(TransactionDTO::getSymbol));
+
+        // Process each group of transactions and create/update the corresponding Holding
+        List<Holding> holdings = new ArrayList<>();
+        for (Map.Entry<String, List<TransactionDTO>> entry : groupedTransactions.entrySet()) {
+            String symbol = entry.getKey();
+            List<TransactionDTO> transactionsForSymbol = entry.getValue();
+
+            Holding holding = new Holding();
+            holding.setSymbol(symbol);
+
+            double totalShares = 0;
+            double totalCost = 0;
+
+            for (TransactionDTO transactionDTO : transactionsForSymbol) {
+                double shares = (transactionDTO.getShares() != null) ? transactionDTO.getShares() : 0.0;
+                double price = (transactionDTO.getPrice() != null) ? transactionDTO.getPrice() : 0.0;
+                double fees = (transactionDTO.getFees() != null) ? transactionDTO.getFees() : 0.0;
+
+                if (TransactionType.BUY.name().equalsIgnoreCase(transactionDTO.getTransactionType())) {
+                    totalShares += shares;
+                    totalCost += (shares * price) + fees;
+                } else if (TransactionType.SELL.name().equalsIgnoreCase(transactionDTO.getTransactionType())) {
+                    totalShares -= shares;
+                    totalCost -= (shares * price) - fees;  // Assuming you get money back after selling
+                }
+            }
+
+            holding.setQuantity(totalShares);
+            if (totalShares != 0) {
+                holding.setAveragePrice(totalCost / totalShares);
+            } else {
+                holding.setAveragePrice(0.0);
+            }
+
+            holdings.add(holding);
+        }
+
+        return holdings;
+    }
+
+
+
+    @Override
+    public PortfolioDTO removeTransaction(Long portfolioId, Long transactionId) {
+        Transaction transaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transaction not found with ID: " + transactionId));
+
+        // Update the corresponding holding
+        Holding holding = holdingRepository.findByPortfolioAndStock(transaction.getPortfolio(), transaction.getStock())
+                .orElseThrow(() -> new RuntimeException("Holding not found for the given transaction"));
+
+        if (transaction.getTransactionType().equals(TransactionType.BUY)) {
+            holding.setQuantity(holding.getQuantity() - transaction.getShares());
+            // Recalculate averagePrice, if needed
+            // ...
+        } else if (transaction.getTransactionType().equals(TransactionType.SELL)) {
+            holding.setQuantity(holding.getQuantity() + transaction.getShares());
+            // Recalculate averagePrice, if needed
+            // ...
+        }
+
+        // Save the updated holding
+        holdingRepository.save(holding);
+
+        // Remove the transaction
+        transactionRepository.delete(transaction);
+
+        // Convert the updated portfolio to DTO and return
+        PortfolioDTO updatedPortfolioDTO = convertToDTO(transaction.getPortfolio());
+        return updatedPortfolioDTO;
+    }
+
+    private PortfolioDTO convertToDTO(Portfolio portfolio) {
+        PortfolioDTO dto = new PortfolioDTO();
+
+        dto.setId(portfolio.getId());
+        dto.setName(portfolio.getName());
+        dto.setDescription(portfolio.getDescription());
+        dto.setUserId(portfolio.getUser().getId());
+        dto.setNotes(portfolio.getNotes());
+
+        // Convert transactions list
+        List<TransactionDTO> transactionDTOs = portfolio.getTransactions().stream()
+                .map(this::convertTransactionToDTO)
+                .collect(Collectors.toList());
+        dto.setTransactions(transactionDTOs);
+
+        // Convert holdings list
+        List<HoldingDTO> holdingDTOs = portfolio.getHoldings().stream()
+                .map(this::convertHoldingToDTO)
+                .collect(Collectors.toList());
+        dto.setHoldings(holdingDTOs);
+
+        return dto;
+    }
+
+    private TransactionDTO convertTransactionToDTO(Transaction transaction) {
+        TransactionDTO dto = new TransactionDTO();
+        dto.setId(transaction.getId());
+        dto.setAssetType(transaction.getAssetType().name());
+        dto.setDate(transaction.getDate());
+        dto.setTransactionType(transaction.getTransactionType().name());
+        dto.setShares(transaction.getShares());
+        dto.setPrice(transaction.getPrice());
+        dto.setFees(transaction.getFees());
+
+        return dto;
+    }
+
+    private HoldingDTO convertHoldingToDTO(Holding holding) {
+        HoldingDTO dto = new HoldingDTO();
+
+        dto.setQuantity(holding.getQuantity());
+        dto.setAveragePrice(holding.getAveragePrice());
+
+        return dto;
+    }
+
+
 
 
     @Override
     public PortfolioDTO findById(Long id) {
-        Optional<Portfolio> portfolio = portfolioRepository.findById(id);
-        return portfolio.map(this::convertToDTO).orElse(null);
+        return null;
     }
 
     @Override
     public List<PortfolioDTO> findAll() {
-        return portfolioRepository.findAll().stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
+        return null;
     }
 
     @Override
     public List<PortfolioDTO> findAllByUserId(Long userId) {
-        List<Portfolio> portfolio = portfolioRepository.findByUserId(userId);
-        return portfolio.stream()
-                .map(this::convertToDTO)  // Assuming you have a method called convertToDTO
-                .collect(Collectors.toList());
+        return null;
     }
 
     @Override
     public List<PortfolioDTO> getPortfolioByUserEmail(String email) {
-        List<Portfolio> portfolio = portfolioRepository.findByUser_Email(email);
-        // Convert the list of Watchlist entities to WatchlistDTOs and return
-        return portfolio.stream()
-                .map(this::convertToDTO)  // Assuming you have a method called convertToDTO
-                .collect(Collectors.toList());
+        return null;
     }
 
     @Override
@@ -134,97 +282,38 @@ public class PortfolioServiceImpl implements PortfolioService {
 
     @Override
     public void deleteById(Long id) {
-        portfolioRepository.deleteById(id);
+
     }
 
     @Override
     public PortfolioDTO updateDetails(Long id, PortfolioDTO portfolioDTO) {
-        Portfolio portfolio = portfolioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found with ID: " + id));
-
-        if (portfolioDTO.getName() != null) {
-            portfolio.setName(portfolioDTO.getName());
-        }
-
-        if (portfolioDTO.getDescription() != null) {
-            portfolio.setDescription(portfolioDTO.getDescription());
-        }
-
-        portfolioRepository.save(portfolio);
-        return convertToDTO(portfolio);
+        return null;
     }
 
-    @Override
-    public PortfolioDTO addTransactions(Long id, List<TransactionDTO> transactions) {
-        Portfolio portfolio = portfolioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found with ID: " + id));
-
-        List<Transaction> newTransactions = convertDTOsToTransactions(transactions);
-        portfolio.getTransactions().addAll(newTransactions);
-
-        // Convert the transactions into holdings
-        List<Holding> newHoldings = convertTransactionsToHoldings(transactions);
-
-        // Add the new holdings to the portfolio
-        portfolio.getHoldings().addAll(newHoldings);
-
-        portfolioRepository.save(portfolio);
-        return convertToDTO(portfolio);
-    }
-
+//    @Override
+//    public PortfolioDTO addTransactions(Long id, List<TransactionDTO> transactions) {
+//        return null;
+//    }
 
     @Override
     public PortfolioDTO removeTransactions(Long id, List<Long> transactionIds) {
-        Portfolio portfolio = portfolioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found with ID: " + id));
-
-        portfolio.getTransactions().removeIf(transaction -> transactionIds.contains(transaction.getId()));
-
-        portfolioRepository.save(portfolio);
-        return convertToDTO(portfolio);
+        return null;
     }
 
     @Override
     public PortfolioDTO addHoldings(Long id, List<HoldingDTO> holdings) {
-        Portfolio portfolio = portfolioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found with ID: " + id));
-
-        List<Holding> newHoldings = convertDTOsToHoldings(holdings);
-        portfolio.getHoldings().addAll(newHoldings);
-
-        portfolioRepository.save(portfolio);
-        return convertToDTO(portfolio);
+        return null;
     }
 
     @Override
     public PortfolioDTO removeHoldings(Long id, List<Long> holdingIds) {
-        Portfolio portfolio = portfolioRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found with ID: " + id));
-
-        portfolio.getHoldings().removeIf(holding -> holdingIds.contains(holding.getId()));
-
-        portfolioRepository.save(portfolio);
-        return convertToDTO(portfolio);
+        return null;
     }
 
     @Override
     public PortfolioDTO updateHolding(Long portfolioId, Long holdingId, HoldingDTO holdingDTO) {
-        Portfolio portfolio = portfolioRepository.findById(portfolioId)
-                .orElseThrow(() -> new RuntimeException("Portfolio not found with ID: " + portfolioId));
-
-        Holding holdingToUpdate = portfolio.getHoldings().stream()
-                .filter(holding -> holding.getId().equals(holdingId))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("Holding not found with ID: " + holdingId));
-
-        holdingToUpdate.setStock(holdingDTO.getStock());
-        holdingToUpdate.setQuantity(holdingDTO.getQuantity());
-        // ... update other attributes as needed
-
-        portfolioRepository.save(portfolio);
-        return convertToDTO(portfolio);
+        return null;
     }
-
 
     @Override
     public List<HoldingDTO> getHoldingsByPortfolioId(Long id) {
@@ -236,208 +325,8 @@ public class PortfolioServiceImpl implements PortfolioService {
         return null;
     }
 
-    @Override
-    public PortfolioDTO removeTransaction(Long portfolioId, Long transactionId) {
-        return null;
-    }
-
-    private PortfolioDTO convertToDTO(Portfolio portfolio) {
-        PortfolioDTO portfolioDTO = new PortfolioDTO();
-
-        // Convert portfolio entity to portfolioDTO and set attributes
-        portfolioDTO.setId(portfolio.getId());
-        portfolioDTO.setName(portfolio.getName());
-        portfolioDTO.setDescription(portfolio.getDescription());
-
-        // Set the userEmail from the User entity associated with the portfolio
-        if (portfolio.getUser() != null) {
-            portfolioDTO.setUser(portfolio.getUser().getEmail());
-        }
-
-        // Convert Transaction entities to TransactionDTOs
-        if (portfolio.getTransactions() != null && !portfolio.getTransactions().isEmpty()) {
-            List<TransactionDTO> transactionDTOs = portfolio.getTransactions().stream()
-                    .map(transaction -> {
-                        TransactionDTO transactionDTO = new TransactionDTO();
-                        transactionDTO.setId(transaction.getId());
-                        transactionDTO.setSymbol(transaction.getStock().getSymbol());
-                        transactionDTO.setDate(transaction.getDate());
-                        transactionDTO.setShares(transaction.getShares());
-                        transactionDTO.setPrice(transaction.getPrice());
-                        transactionDTO.setFees(transaction.getFees());
-                        // Set other attributes from transaction to transactionDTO here...
-                        // If you have any external data fetching similar to the stocks, you can implement it here.
-
-                        logger.info("Converted Transaction: {}", transactionDTO);
-
-                        return transactionDTO;
-                    })
-                    .collect(Collectors.toList());
-            portfolioDTO.setTransactions(transactionDTOs);
-        }
-
-        // Convert Transaction entities to TransactionDTOs
-        if (portfolio.getHoldings() != null && !portfolio.getHoldings().isEmpty()) {
-            List<HoldingDTO> holdingDTOs = portfolio.getHoldings().stream()
-                    .map(holding -> {
-                        HoldingDTO holdingDTO = new HoldingDTO();
-                        holdingDTO.setId(holding.getId());
-                        holdingDTO.setStock(holding.getStock());
-                        holdingDTO.setQuantity(holding.getQuantity());
-                        holdingDTO.setAveragePrice(holding.getAveragePrice());
-                        holdingDTO.setPortfolio(holding.getPortfolio());
-
-                        logger.info("Converted Holdings: {}", holdingDTO);
-
-                        return holdingDTO;
-                    })
-                    .collect(Collectors.toList());
-            portfolioDTO.setHoldings(holdingDTOs);
-        }
-
-        // Similarly, you can convert other entities like Holding to DTOs and set them to the PortfolioDTO
-
-        return portfolioDTO;
-    }
-
-
-    private List<Transaction> convertDTOsToTransactions(List<TransactionDTO> transactionDTOs) {
-        if (transactionDTOs == null) {
-            return Collections.emptyList();
-        }
-
-        return transactionDTOs.stream()
-                .map(transactionDTO -> {
-                    Transaction transaction = new Transaction();
-                    transaction.setId(transactionDTO.getId());
-
-                    if (transactionDTO.getAssetType() != null && AssetType.valueOf(transactionDTO.getAssetType()) == AssetType.SECURITY) {
-                        // Convert StockDTO to Stock entity and always save it
-                        Stock stock = convertTransactionSymbolToStock(transactionDTO.getSymbol());
-                        stock = stockRepository.save(stock);  // Always save the stock
-                        transaction.setStock(stock);
-                        transaction.setFees(transactionDTO.getFees());
-                    } else if (transactionDTO.getAssetType() != null && AssetType.valueOf(transactionDTO.getAssetType()) == AssetType.CASH) {
-                        // For CASH transactions, fees are not set
-                        transaction.setFees(0.0);
-                    }
-
-                    transaction.setDate(transactionDTO.getDate());
-                    transaction.setShares(transactionDTO.getShares());
-                    transaction.setPrice(transactionDTO.getPrice());
-
-                    if (transactionDTO.getTransactionType() != null) {
-                        transaction.setTransactionType(TransactionType.valueOf(transactionDTO.getTransactionType()));
-                    }
-
-                    // ... set other attributes as needed
-
-                    return transaction;
-                })
-                .collect(Collectors.toList());
-    }
-
-
-
-
-    private Stock convertTransactionSymbolToStock(String symbol) {
-        Stock stock = new Stock();
-        stock.setSymbol(symbol);
-
-        String financialDataJson = twelveDataService.fetchCompanyFundamentals(symbol);
-        try {
-            JSONObject financialData = new JSONObject(financialDataJson);
-
-            // Extracting the Stock name
-            if (financialData.has("name")) {
-                stock.setName(financialData.getString("name"));
-            }
-            // Extracting current price
-            if (financialData.has("close")) {
-                stock.setCurrentPrice(financialData.getDouble("close"));
-            }
-            // Extracting percentage change
-            if (financialData.has("percent_change")) {
-                stock.setPercentageChange(financialData.getDouble("percent_change"));
-            }
-
-            // You can add other attributes extraction here as needed...
-
-        } catch (JSONException e) {
-            // Log the error or handle it as appropriate
-            System.err.println("Error parsing JSON for stock: " + stock.getSymbol());
-            e.printStackTrace();
-        }
-
-        return stock;
-    }
-    private List<Holding> convertTransactionsToHoldings(List<TransactionDTO> transactions) {
-        if (transactions == null) {
-            return Collections.emptyList();
-        }
-
-        // Use a map to aggregate transactions by stock symbol
-        Map<String, Holding> holdingMap = new HashMap<>();
-
-        for (TransactionDTO transactionDTO : transactions) {
-            if (transactionDTO.getAssetType() != null && AssetType.valueOf(transactionDTO.getAssetType()) == AssetType.SECURITY) {
-                String symbol = transactionDTO.getSymbol();
-                Holding holding = holdingMap.get(symbol);
-
-                if (holding == null) {
-                    holding = new Holding();
-                    holding.setAveragePrice(0.0); // Initialize averagePrice
-                    holding.setQuantity(0.0);    // Initialize quantity
-                }
-
-                // Convert StockDTO to Stock entity
-                Stock stock = convertTransactionSymbolToStock(symbol);
-                stock = stockRepository.save(stock);  // Always save the stock
-                holding.setStock(stock);
-
-                double totalCostBefore = holding.getAveragePrice() * holding.getQuantity();
-                double transactionCost = transactionDTO.getPrice() * transactionDTO.getShares();
-
-                if (transactionDTO.getTransactionType().equals(TransactionType.BUY_LONG.name())) {
-                    holding.setQuantity(holding.getQuantity() + transactionDTO.getShares());
-                } else if (transactionDTO.getTransactionType().equals(TransactionType.SELL_LONG.name())) {
-                    holding.setQuantity(holding.getQuantity() - transactionDTO.getShares());
-                }
-                // Handle other transaction types as needed...
-
-                double totalCostAfter = totalCostBefore + transactionCost;
-                if (holding.getQuantity() != 0) {
-                    holding.setAveragePrice(totalCostAfter / holding.getQuantity());
-                } else {
-                    holding.setAveragePrice(0.0);
-                }
-
-                holdingMap.put(symbol, holding);
-            }
-        }
-
-        return new ArrayList<>(holdingMap.values());
-    }
-
-
-
-
-    private List<Holding> convertDTOsToHoldings(List<HoldingDTO> holdingDTOs) {
-        if (holdingDTOs == null) {
-            return Collections.emptyList();
-        }
-
-        return holdingDTOs.stream()
-                .map(holdingDTO -> {
-                    Holding holding = new Holding();
-                    holding.setId(holdingDTO.getId());
-                    holding.setStock(holdingDTO.getStock());
-                    holding.setQuantity(holdingDTO.getQuantity());
-                    // ... set other attributes as needed
-
-                    return holding;
-                })
-                .collect(Collectors.toList());
-    }
-
+//    @Override
+//    public PortfolioDTO removeTransaction(Long portfolioId, Long transactionId) {
+//        return null;
+//    }
 }

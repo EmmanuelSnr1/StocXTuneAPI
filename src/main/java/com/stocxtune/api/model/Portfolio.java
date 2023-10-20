@@ -4,14 +4,13 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
-
+@Entity
+@Table(name = "portfolios")
 @Getter
 @Setter
 @ToString
 @RequiredArgsConstructor
 @NoArgsConstructor
-@Entity
-@Table(name = "portfolios")
 public class Portfolio {
 
     @Id
@@ -23,21 +22,26 @@ public class Portfolio {
 
     private String description;
 
-
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "portfolio_transactions",
+            joinColumns = @JoinColumn(name = "portfolio_id"),
+            inverseJoinColumns = @JoinColumn(name = "transaction_id"))
     private List<Transaction> transactions;
 
-    @OneToMany(mappedBy = "portfolio", cascade = CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "portfolio_holdings",
+            joinColumns = @JoinColumn(name = "portfolio_id"),
+            inverseJoinColumns = @JoinColumn(name = "holding_id"))
     private List<Holding> holdings;
 
     private String notes;
 
     // Other attributes as needed...
 }
+
 
 
