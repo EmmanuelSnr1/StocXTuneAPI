@@ -36,4 +36,6 @@ public class Watchlist {
     private List<Stock> stocks;
 
     // Other attributes as needed...
+    // Some ideas would be some notes on the watchlist.
+
 }

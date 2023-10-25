@@ -217,6 +217,7 @@ public class WatchlistServiceImpl implements WatchlistService {
 //        // Similar to the logic you provided in the initial update method
 //    }
 
+
     public WatchlistDTO update(Long id, WatchlistDTO watchlistDTO) {
         Watchlist watchlist = watchlistRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Watchlist not found with ID: " + id));
