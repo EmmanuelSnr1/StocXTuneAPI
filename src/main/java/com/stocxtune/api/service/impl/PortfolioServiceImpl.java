@@ -89,9 +89,9 @@ public class PortfolioServiceImpl implements PortfolioService {
         List<Transaction> newTransactions = convertDTOsToTransactions(transactionDTOs);
         portfolio.getTransactions().addAll(newTransactions);
 
-
-//            List<Holding> newHoldings = convertTransactionDTOsToHoldings(transactionDTOs);
-//            portfolio.getHoldings().addAll(newHoldings);
+        //not properly creating the holdings. Remember to fix this relating to the convert Transaction DTOs to Holdings
+//        List<Holding> newHoldings = convertTransactionDTOsToHoldings(transactionDTOs);
+//        portfolio.getHoldings().addAll(newHoldings);
 
 
         // Convert the updated portfolio to DTO and return
