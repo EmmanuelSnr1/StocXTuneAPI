@@ -4,6 +4,7 @@ import com.stocxtune.api.dao.UserDao;
 import com.stocxtune.api.dto.HoldingDTO;
 import com.stocxtune.api.dto.PortfolioDTO;
 import com.stocxtune.api.dto.TransactionDTO;
+import com.stocxtune.api.dto.WatchlistDTO;
 import com.stocxtune.api.model.User;
 import com.stocxtune.api.security.services.UserDetailsImpl;
 import com.stocxtune.api.service.PortfolioService;
@@ -44,6 +45,20 @@ public class PortfolioController {
         // Set the userEmail in the WatchlistDTO
         portfolioDTO.setUserId(userId); // Updated this line
         return ResponseEntity.ok(portfolioService.save(portfolioDTO));
+    }
+
+    @GetMapping("/my-portfolio")
+    public List<PortfolioDTO> getAllPortfoliosForUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (!(authentication.getPrincipal() instanceof UserDetailsImpl)) {
+            throw new RuntimeException("Unexpected user details type");
+        }
+        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+        Long userId = userDetails.getId();
+        String email = userDetails.getEmail();
+//        return watchlistService.findAllByUserId(userId);
+        return portfolioService.findAllByUserId(userId);
+
     }
 
     @GetMapping("/{id}")

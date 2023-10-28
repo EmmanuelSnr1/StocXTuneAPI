@@ -267,7 +267,11 @@ public class PortfolioServiceImpl implements PortfolioService {
 
     @Override
     public List<PortfolioDTO> findAllByUserId(Long userId) {
-        return null;
+        List<Portfolio> portfolio = portfolioRepository.findByUserId(userId);
+
+        return portfolio.stream()
+                .map(this::convertToDTO)  // Assuming you have a method called convertToDTO
+                .collect(Collectors.toList());
     }
 
     @Override
