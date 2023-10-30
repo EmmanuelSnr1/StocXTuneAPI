@@ -52,6 +52,8 @@ public class PortfolioServiceImpl implements PortfolioService {
     private static final Logger logger = LoggerFactory.getLogger(PortfolioServiceImpl.class);
 
 
+
+    // Portfolio Related methods
     @Override
     @Transactional
     public PortfolioDTO save(PortfolioDTO portfolioDTO) {
@@ -81,6 +83,45 @@ public class PortfolioServiceImpl implements PortfolioService {
     }
 
     @Override
+    public PortfolioDTO findById(Long id) {
+        return null;
+    }
+
+    @Override
+    public List<PortfolioDTO> findAll() {
+        return null;
+    }
+
+    @Override
+    public List<PortfolioDTO> findAllByUserId(Long userId) {
+        List<Portfolio> portfolio = portfolioRepository.findByUserId(userId);
+
+        return portfolio.stream()
+                .map(this::convertToDTO)  // Assuming you have a method called convertToDTO
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<PortfolioDTO> getPortfolioByUserEmail(String email) {
+        return null;
+    }
+
+    @Override
+    public PortfolioDTO update(Long id, PortfolioDTO portfolioDTO) {
+        return null;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+
+    }
+
+    @Override
+    public PortfolioDTO updateDetails(Long id, PortfolioDTO portfolioDTO) {
+        return null;
+    }
+
+    @Override
     @Transactional
     public PortfolioDTO addTransactions(Long portfolioId, List<TransactionDTO> transactionDTOs) {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
@@ -98,33 +139,7 @@ public class PortfolioServiceImpl implements PortfolioService {
         portfolioRepository.save(portfolio);
         return convertToDTO(portfolio);
     }
-    private List<Transaction> convertDTOsToTransactions(List<TransactionDTO> transactionDTOs) {
-        if (transactionDTOs == null) {
-            return Collections.emptyList();
-        }
 
-        return transactionDTOs.stream()
-                .map(transactionDTO -> {
-                    Transaction transaction = new Transaction();
-                    transaction.setId(transactionDTO.getId());
-                    transaction.setDate(transactionDTO.getDate());
-                    transaction.setSymbol(transactionDTO.getSymbol());
-                    transaction.setShares(transactionDTO.getShares());
-                    transaction.setPrice(transactionDTO.getPrice());
-                    transaction.setFees(transactionDTO.getFees());
-
-                    // Convert string representation of enums to actual enum values
-                    if (transactionDTO.getAssetType() != null) {
-                        transaction.setAssetType(AssetType.valueOf(transactionDTO.getAssetType()));
-                    }
-                    if (transactionDTO.getTransactionType() != null) {
-                        transaction.setTransactionType(TransactionType.valueOf(transactionDTO.getTransactionType()));
-                    }
-
-                    return transaction;
-                })
-                .collect(Collectors.toList());
-    }
 
     private List<Holding> convertTransactionDTOsToHoldings(List<TransactionDTO> transactionDTOs) {
         if (transactionDTOs == null) {
@@ -255,44 +270,7 @@ public class PortfolioServiceImpl implements PortfolioService {
 
 
 
-    @Override
-    public PortfolioDTO findById(Long id) {
-        return null;
-    }
 
-    @Override
-    public List<PortfolioDTO> findAll() {
-        return null;
-    }
-
-    @Override
-    public List<PortfolioDTO> findAllByUserId(Long userId) {
-        List<Portfolio> portfolio = portfolioRepository.findByUserId(userId);
-
-        return portfolio.stream()
-                .map(this::convertToDTO)  // Assuming you have a method called convertToDTO
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<PortfolioDTO> getPortfolioByUserEmail(String email) {
-        return null;
-    }
-
-    @Override
-    public PortfolioDTO update(Long id, PortfolioDTO portfolioDTO) {
-        return null;
-    }
-
-    @Override
-    public void deleteById(Long id) {
-
-    }
-
-    @Override
-    public PortfolioDTO updateDetails(Long id, PortfolioDTO portfolioDTO) {
-        return null;
-    }
 
 //    @Override
 //    public PortfolioDTO addTransactions(Long id, List<TransactionDTO> transactions) {
@@ -333,4 +311,34 @@ public class PortfolioServiceImpl implements PortfolioService {
 //    public PortfolioDTO removeTransaction(Long portfolioId, Long transactionId) {
 //        return null;
 //    }
+
+
+    // Helper Methods.
+    private List<Transaction> convertDTOsToTransactions(List<TransactionDTO> transactionDTOs) {
+        if (transactionDTOs == null) {
+            return Collections.emptyList();
+        }
+
+        return transactionDTOs.stream()
+                .map(transactionDTO -> {
+                    Transaction transaction = new Transaction();
+                    transaction.setId(transactionDTO.getId());
+                    transaction.setDate(transactionDTO.getDate());
+                    transaction.setSymbol(transactionDTO.getSymbol());
+                    transaction.setShares(transactionDTO.getShares());
+                    transaction.setPrice(transactionDTO.getPrice());
+                    transaction.setFees(transactionDTO.getFees());
+
+                    // Convert string representation of enums to actual enum values
+                    if (transactionDTO.getAssetType() != null) {
+                        transaction.setAssetType(AssetType.valueOf(transactionDTO.getAssetType()));
+                    }
+                    if (transactionDTO.getTransactionType() != null) {
+                        transaction.setTransactionType(TransactionType.valueOf(transactionDTO.getTransactionType()));
+                    }
+
+                    return transaction;
+                })
+                .collect(Collectors.toList());
+    }
 }
