@@ -69,7 +69,7 @@ public interface PortfolioService {
      * @param id The ID of the portfolio.
      * @return The list of holdings for the portfolio.
      */
-    List<HoldingDTO> getHoldingsByPortfolioId(Long id);
+    List<HoldingDTO> getHoldingsByPortfolioId(Long portfolioId);
 
     PortfolioDTO removeHolding(Long portfolioId, Long holdingId);
 
