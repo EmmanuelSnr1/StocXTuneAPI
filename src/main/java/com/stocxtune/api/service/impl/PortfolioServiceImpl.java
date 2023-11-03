@@ -131,8 +131,8 @@ public class PortfolioServiceImpl implements PortfolioService {
         portfolio.getTransactions().addAll(newTransactions);
 
         //not properly creating the holdings. Remember to fix this relating to the convert Transaction DTOs to Holdings
-//        List<Holding> newHoldings = convertTransactionDTOsToHoldings(transactionDTOs);
-//        portfolio.getHoldings().addAll(newHoldings);
+        List<Holding> newHoldings = convertTransactionDTOsToHoldings(transactionDTOs);
+        portfolio.getHoldings().addAll(newHoldings);
 
 
         // Convert the updated portfolio to DTO and return
@@ -141,53 +141,7 @@ public class PortfolioServiceImpl implements PortfolioService {
     }
 
 
-    private List<Holding> convertTransactionDTOsToHoldings(List<TransactionDTO> transactionDTOs) {
-        if (transactionDTOs == null) {
-            return Collections.emptyList();
-        }
 
-        // Use a map to group transactions by symbol
-        Map<String, List<TransactionDTO>> groupedTransactions = transactionDTOs.stream()
-                .collect(Collectors.groupingBy(TransactionDTO::getSymbol));
-
-        // Process each group of transactions and create/update the corresponding Holding
-        List<Holding> holdings = new ArrayList<>();
-        for (Map.Entry<String, List<TransactionDTO>> entry : groupedTransactions.entrySet()) {
-            String symbol = entry.getKey();
-            List<TransactionDTO> transactionsForSymbol = entry.getValue();
-
-            Holding holding = new Holding();
-            holding.setSymbol(symbol);
-
-            double totalShares = 0;
-            double totalCost = 0;
-
-            for (TransactionDTO transactionDTO : transactionsForSymbol) {
-                double shares = (transactionDTO.getShares() != null) ? transactionDTO.getShares() : 0.0;
-                double price = (transactionDTO.getPrice() != null) ? transactionDTO.getPrice() : 0.0;
-                double fees = (transactionDTO.getFees() != null) ? transactionDTO.getFees() : 0.0;
-
-                if (TransactionType.BUY.name().equalsIgnoreCase(transactionDTO.getTransactionType())) {
-                    totalShares += shares;
-                    totalCost += (shares * price) + fees;
-                } else if (TransactionType.SELL.name().equalsIgnoreCase(transactionDTO.getTransactionType())) {
-                    totalShares -= shares;
-                    totalCost -= (shares * price) - fees;  // Assuming you get money back after selling
-                }
-            }
-
-            holding.setQuantity(totalShares);
-            if (totalShares != 0) {
-                holding.setAveragePrice(totalCost / totalShares);
-            } else {
-                holding.setAveragePrice(0.0);
-            }
-
-            holdings.add(holding);
-        }
-
-        return holdings;
-    }
 
 
 
@@ -221,51 +175,7 @@ public class PortfolioServiceImpl implements PortfolioService {
         return updatedPortfolioDTO;
     }
 
-    private PortfolioDTO convertToDTO(Portfolio portfolio) {
-        PortfolioDTO dto = new PortfolioDTO();
 
-        dto.setId(portfolio.getId());
-        dto.setName(portfolio.getName());
-        dto.setDescription(portfolio.getDescription());
-        dto.setUserId(portfolio.getUser().getId());
-        dto.setNotes(portfolio.getNotes());
-
-        // Convert transactions list
-        List<TransactionDTO> transactionDTOs = portfolio.getTransactions().stream()
-                .map(this::convertTransactionToDTO)
-                .collect(Collectors.toList());
-        dto.setTransactions(transactionDTOs);
-
-        // Convert holdings list
-        List<HoldingDTO> holdingDTOs = portfolio.getHoldings().stream()
-                .map(this::convertHoldingToDTO)
-                .collect(Collectors.toList());
-        dto.setHoldings(holdingDTOs);
-
-        return dto;
-    }
-
-    private TransactionDTO convertTransactionToDTO(Transaction transaction) {
-        TransactionDTO dto = new TransactionDTO();
-        dto.setId(transaction.getId());
-        dto.setAssetType(transaction.getAssetType().name());
-        dto.setDate(transaction.getDate());
-        dto.setTransactionType(transaction.getTransactionType().name());
-        dto.setShares(transaction.getShares());
-        dto.setPrice(transaction.getPrice());
-        dto.setFees(transaction.getFees());
-
-        return dto;
-    }
-
-    private HoldingDTO convertHoldingToDTO(Holding holding) {
-        HoldingDTO dto = new HoldingDTO();
-
-        dto.setQuantity(holding.getQuantity());
-        dto.setAveragePrice(holding.getAveragePrice());
-
-        return dto;
-    }
 
 
 
@@ -340,5 +250,100 @@ public class PortfolioServiceImpl implements PortfolioService {
                     return transaction;
                 })
                 .collect(Collectors.toList());
+    }
+
+    private TransactionDTO convertTransactionToDTO(Transaction transaction) {
+        TransactionDTO dto = new TransactionDTO();
+        dto.setId(transaction.getId());
+        dto.setAssetType(transaction.getAssetType().name());
+        dto.setDate(transaction.getDate());
+        dto.setTransactionType(transaction.getTransactionType().name());
+        dto.setShares(transaction.getShares());
+        dto.setPrice(transaction.getPrice());
+        dto.setFees(transaction.getFees());
+
+        return dto;
+    }
+
+    //sets values for holdings to be returned to user
+    private HoldingDTO convertHoldingToDTO(Holding holding) {
+        HoldingDTO dto = new HoldingDTO();
+
+        dto.setSymbol(holding.getSymbol());
+        dto.setQuantity(holding.getQuantity());
+        dto.setAveragePrice(holding.getAveragePrice());
+
+        return dto;
+    }
+
+    private PortfolioDTO convertToDTO(Portfolio portfolio) {
+        PortfolioDTO dto = new PortfolioDTO();
+
+        dto.setId(portfolio.getId());
+        dto.setName(portfolio.getName());
+        dto.setDescription(portfolio.getDescription());
+        dto.setUserId(portfolio.getUser().getId());
+        dto.setNotes(portfolio.getNotes());
+
+        // Convert transactions list
+        List<TransactionDTO> transactionDTOs = portfolio.getTransactions().stream()
+                .map(this::convertTransactionToDTO)
+                .collect(Collectors.toList());
+        dto.setTransactions(transactionDTOs);
+
+        // Convert holdings list
+        List<HoldingDTO> holdingDTOs = portfolio.getHoldings().stream()
+                .map(this::convertHoldingToDTO)
+                .collect(Collectors.toList());
+        dto.setHoldings(holdingDTOs);
+
+        return dto;
+    }
+    private List<Holding> convertTransactionDTOsToHoldings(List<TransactionDTO> transactionDTOs) {
+        if (transactionDTOs == null) {
+            return Collections.emptyList();
+        }
+
+        // Use a map to group transactions by symbol
+        Map<String, List<TransactionDTO>> groupedTransactions = transactionDTOs.stream()
+                .collect(Collectors.groupingBy(TransactionDTO::getSymbol));
+
+        // Process each group of transactions and create/update the corresponding Holding
+        List<Holding> holdings = new ArrayList<>();
+        for (Map.Entry<String, List<TransactionDTO>> entry : groupedTransactions.entrySet()) {
+            String symbol = entry.getKey();
+            List<TransactionDTO> transactionsForSymbol = entry.getValue();
+
+            Holding holding = new Holding();
+            holding.setSymbol(symbol);
+
+            double totalShares = 0;
+            double totalCost = 0;
+
+            for (TransactionDTO transactionDTO : transactionsForSymbol) {
+                double shares = (transactionDTO.getShares() != null) ? transactionDTO.getShares() : 0.0;
+                double price = (transactionDTO.getPrice() != null) ? transactionDTO.getPrice() : 0.0;
+                double fees = (transactionDTO.getFees() != null) ? transactionDTO.getFees() : 0.0;
+
+                if (TransactionType.BUY.name().equalsIgnoreCase(transactionDTO.getTransactionType())) {
+                    totalShares += shares;
+                    totalCost += (shares * price) + fees;
+                } else if (TransactionType.SELL.name().equalsIgnoreCase(transactionDTO.getTransactionType())) {
+                    totalShares -= shares;
+                    totalCost -= (shares * price) - fees;  // Assuming you get money back after selling
+                }
+            }
+
+            holding.setQuantity(totalShares);
+            if (totalShares != 0) {
+                holding.setAveragePrice(totalCost / totalShares);
+            } else {
+                holding.setAveragePrice(0.0);
+            }
+
+            holdings.add(holding);
+        }
+
+        return holdings;
     }
 }
