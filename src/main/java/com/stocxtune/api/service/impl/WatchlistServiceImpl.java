@@ -162,7 +162,7 @@ public class WatchlistServiceImpl implements WatchlistService {
                             e.printStackTrace();
                         }
 
-                        logger.info(" Converted Watchlist : {}", stockDTO);
+//                        logger.info(" Converted Watchlist : {}", stockDTO);
 
                         return stockDTO;
 
