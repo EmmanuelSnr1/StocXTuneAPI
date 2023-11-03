@@ -8,7 +8,7 @@ import java.util.List;
 @Table(name = "portfolios")
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "transactions") // Exclude the transactions field from the generated toString method
 @RequiredArgsConstructor
 @NoArgsConstructor
 public class Portfolio {

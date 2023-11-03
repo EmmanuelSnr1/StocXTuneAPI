@@ -12,7 +12,7 @@ import com.stocxtune.api.enums.TransactionEnums.TransactionType;
 @Table(name = "transactions")
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "portfolios") // Exclude the transactions field from the generated toString method
 @NoArgsConstructor
 public class Transaction {
 
