@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -127,7 +128,7 @@ public class PortfolioServiceImpl implements PortfolioService {
         Portfolio portfolio = portfolioRepository.findById(portfolioId)
                 .orElseThrow(() -> new RuntimeException("Portfolio not found with ID: " + portfolioId));
 
-        List<Transaction> newTransactions = convertDTOsToTransactions(transactionDTOs);
+        List<Transaction> newTransactions = convertDTOsToTransactions(portfolioId, transactionDTOs);
         portfolio.getTransactions().addAll(newTransactions);
 
         for (TransactionDTO transactionDTO : transactionDTOs) {
@@ -228,8 +229,16 @@ public class PortfolioServiceImpl implements PortfolioService {
     }
 
     @Override
-    public List<HoldingDTO> getHoldingsByPortfolioId(Long id) {
-        return null;
+    public List<HoldingDTO> getHoldingsByPortfolioId(Long portfolioId) {
+        // Retrieve transactions related to the portfolio
+        List<Transaction> transactions = transactionRepository.findByPortfolioId(portfolioId);
+        logger.info("The transactions for the portfolio " + portfolioId + " Are " +  transactions.size());
+
+        // Calculate holdings based on transactions
+        List<HoldingDTO> holdings = calculateHoldings(transactions);
+
+        // Return the list of HoldingDTOs
+        return holdings;
     }
 
     @Override
@@ -244,10 +253,15 @@ public class PortfolioServiceImpl implements PortfolioService {
 
 
     // Helper Methods.
-    private List<Transaction> convertDTOsToTransactions(List<TransactionDTO> transactionDTOs) {
+    private List<Transaction> convertDTOsToTransactions(Long portfolioId, List<TransactionDTO> transactionDTOs) {
         if (transactionDTOs == null) {
             return Collections.emptyList();
         }
+
+        // Fetch the Portfolio entity once before the loop
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new EntityNotFoundException("Portfolio not found with id: " + portfolioId));
+
 
         return transactionDTOs.stream()
                 .map(transactionDTO -> {
@@ -258,6 +272,8 @@ public class PortfolioServiceImpl implements PortfolioService {
                     transaction.setShares(transactionDTO.getShares());
                     transaction.setPrice(transactionDTO.getPrice());
                     transaction.setFees(transactionDTO.getFees());
+
+                    transaction.setPortfolio(portfolio);
 
                     // Convert string representation of enums to actual enum values
                     if (transactionDTO.getAssetType() != null) {
@@ -366,4 +382,52 @@ public class PortfolioServiceImpl implements PortfolioService {
 
         return holdings;
     }
+
+
+    private List<HoldingDTO> calculateHoldings(List<Transaction> transactions) {
+        // Filter transactions by asset type 'SECURITY'
+        List<Transaction> securityTransactions = transactions.stream()
+                .filter(t -> AssetType.SECURITY.equals(t.getAssetType()))
+                .collect(Collectors.toList());
+
+        // Group transactions by symbol
+        Map<String, List<Transaction>> transactionsBySymbol = securityTransactions.stream()
+                .collect(Collectors.groupingBy(Transaction::getSymbol));
+
+        // Calculate holdings for each symbol
+        List<HoldingDTO> holdings = new ArrayList<>();
+        transactionsBySymbol.forEach((symbol, transactionList) -> {
+            double totalShares = 0;
+            double totalCost = 0;
+
+            for (Transaction transaction : transactionList) {
+                double transactionAmount = transaction.getShares() * transaction.getPrice();
+                // If it's a buy transaction, add the shares and cost, if it's a sell, subtract them
+                if (TransactionType.BUY.equals(transaction.getTransactionType())) {
+                    totalShares += transaction.getShares();
+                    totalCost += transactionAmount;
+                } else if (TransactionType.SELL.equals(transaction.getTransactionType())) {
+                    totalShares -= transaction.getShares();
+                    totalCost -= transactionAmount;
+                }
+            }
+
+            // Only add to holdings if the total shares are greater than 0
+            if (totalShares > 0) {
+                HoldingDTO holding = new HoldingDTO();
+                holding.setSymbol(symbol);
+                holding.setQuantity(totalShares);
+                // Calculate the average price based on the total cost and total shares
+                double averagePrice = totalCost / totalShares;
+                holding.setAveragePrice(averagePrice);
+
+                holdings.add(holding);
+            }
+        });
+
+        return holdings;
+    }
+
+
+
 }
