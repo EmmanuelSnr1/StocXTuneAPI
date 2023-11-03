@@ -41,7 +41,7 @@ class PortfolioServiceImplTest {
         PortfolioDTO portfolioDTO = new PortfolioDTO();
         portfolioDTO.setName("Test Portfolio");
         portfolioDTO.setDescription("Test Description");
-        portfolioDTO.setUser("test@example.com");
+//        portfolioDTO.setUser("test@example.com");
 
         User mockUser = new User();
         mockUser.setId(1L);
