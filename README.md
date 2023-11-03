@@ -13,6 +13,9 @@ Technologies:
 
 - Sourcing Data from RAPID API
 
+# Sources of Information: 
+- Java 8 Stream API https://www.w3schools.blog/java-8-stream-api-tutorial-with-examples
+
 # TODO 
 - General 
   - Clean up portfolio Service Implementation service.
