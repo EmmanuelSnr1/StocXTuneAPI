@@ -16,6 +16,7 @@ public class HoldingDTO {
     private String symbol;
     private Double quantity;
     private Double averagePrice;
+    private Double cashValue;
 
     // Other attributes as needed...
 }
