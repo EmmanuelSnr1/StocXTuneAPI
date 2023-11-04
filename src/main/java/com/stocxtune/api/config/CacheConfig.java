@@ -39,7 +39,8 @@ public class CacheConfig {
                 "saveWatchlist",
                 "getWatchlistByUserEmail",
                 "findPortfolioByID",
-                "savePortfolio"
+                "savePortfolio",
+                "getHoldingsByPortfolioId"
         );
     }
 

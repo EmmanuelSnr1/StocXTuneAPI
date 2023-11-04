@@ -66,9 +66,9 @@ public interface PortfolioService {
     /**
      * Fetches all holdings for a specific portfolio.
      *
-     * @param id The ID of the portfolio.
      * @return The list of holdings for the portfolio.
      */
+    @Cacheable(value = "getHoldingsByPortfolioId")
     List<HoldingDTO> getHoldingsByPortfolioId(Long portfolioId);
 
     PortfolioDTO removeHolding(Long portfolioId, Long holdingId);

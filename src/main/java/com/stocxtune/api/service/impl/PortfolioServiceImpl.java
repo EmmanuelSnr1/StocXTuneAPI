@@ -131,28 +131,30 @@ public class PortfolioServiceImpl implements PortfolioService {
         List<Transaction> newTransactions = convertDTOsToTransactions(portfolioId, transactionDTOs);
         portfolio.getTransactions().addAll(newTransactions);
 
-        for (TransactionDTO transactionDTO : transactionDTOs) {
-            try {
-                AssetType assetType = AssetType.valueOf(transactionDTO.getAssetType());
-                switch (assetType) {
-                    case SECURITY:
-                        logger.info("Yes the asset type is a Security");
-                        List<Holding> newHoldings = convertTransactionDTOsToHoldings(transactionDTOs);
-                        portfolio.getHoldings().addAll(newHoldings);
-                        break;
-                    case CASH:
-                        logger.info("Yes the asset type is a Cash");
-                        break;
-                    default:
-                        // If the asset type is known but not handled, you can add additional cases.
-                        logger.info("Asset type is known but not handled in this switch case");
-                        break;
-                }
-            } catch (IllegalArgumentException e) {
-                // This block will catch the exception thrown by valueOf if the asset type is not valid.
-                throw new IllegalArgumentException("Unknown asset type: " + transactionDTO.getAssetType());
-            }
-        }
+
+    //We're computing Holdings on the fly now. so we might have to hold off this for a while.
+//        for (TransactionDTO transactionDTO : transactionDTOs) {
+//            try {
+//                AssetType assetType = AssetType.valueOf(transactionDTO.getAssetType());
+//                switch (assetType) {
+//                    case SECURITY:
+//                        logger.info("Yes the asset type is a Security");
+//                        List<Holding> newHoldings = convertTransactionDTOsToHoldings(transactionDTOs);
+//                        portfolio.getHoldings().addAll(newHoldings);
+//                        break;
+//                    case CASH:
+//                        logger.info("Yes the asset type is a Cash");
+//                        break;
+//                    default:
+//                        // If the asset type is known but not handled, you can add additional cases.
+//                        logger.info("Asset type is known but not handled in this switch case");
+//                        break;
+//                }
+//            } catch (IllegalArgumentException e) {
+//                // This block will catch the exception thrown by valueOf if the asset type is not valid.
+//                throw new IllegalArgumentException("Unknown asset type: " + transactionDTO.getAssetType());
+//            }
+//        }
 
 
 
