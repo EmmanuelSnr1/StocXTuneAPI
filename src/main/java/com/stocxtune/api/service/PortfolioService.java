@@ -24,10 +24,10 @@ public interface PortfolioService {
     List<PortfolioDTO> getPortfolioByUserEmail(String email);
 
     @Cacheable(value = "updatePortfolio")
-    PortfolioDTO update(Long id, PortfolioDTO portfolioDTO);
+    PortfolioDTO updatePortfolio(Long id, PortfolioDTO portfolioDTO);
 
     @Cacheable(value = "deletePortfolio")
-    void deleteById(Long id);
+    void deletePortfolio(Long id);
 
     PortfolioDTO updateDetails(Long id, PortfolioDTO portfolioDTO);
 

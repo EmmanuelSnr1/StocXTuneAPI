@@ -4,7 +4,6 @@ import com.stocxtune.api.dao.UserDao;
 import com.stocxtune.api.dto.HoldingDTO;
 import com.stocxtune.api.dto.PortfolioDTO;
 import com.stocxtune.api.dto.TransactionDTO;
-import com.stocxtune.api.dto.WatchlistDTO;
 import com.stocxtune.api.model.User;
 import com.stocxtune.api.security.services.UserDetailsImpl;
 import com.stocxtune.api.service.PortfolioService;
@@ -68,12 +67,12 @@ public class PortfolioController {
 
     @PutMapping("/{id}")
     public ResponseEntity<PortfolioDTO> updatePortfolio(@PathVariable Long id, @RequestBody PortfolioDTO portfolioDTO) {
-        return ResponseEntity.ok(portfolioService.update(id, portfolioDTO));
+        return ResponseEntity.ok(portfolioService.updatePortfolio(id, portfolioDTO));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePortfolio(@PathVariable Long id) {
-        portfolioService.deleteById(id);
+        portfolioService.deletePortfolio(id);
         return ResponseEntity.noContent().build();
     }
 

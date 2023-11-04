@@ -108,12 +108,50 @@ public class PortfolioServiceImpl implements PortfolioService {
     }
 
     @Override
-    public PortfolioDTO update(Long id, PortfolioDTO portfolioDTO) {
-        return null;
+    public PortfolioDTO updatePortfolio(Long portfolioId, PortfolioDTO portfolioDTO) {
+        // Retrieve the existing Portfolio entity
+        Portfolio existingPortfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found with ID: " + portfolioId));
+
+        // Update the existing Portfolio entity with values from the DTO
+        existingPortfolio.setName(portfolioDTO.getName());
+        existingPortfolio.setDescription(portfolioDTO.getDescription());
+
+        // If the user ID is being updated, fetch the new user and set it
+        if (portfolioDTO.getUserId() != null && !portfolioDTO.getUserId().equals(existingPortfolio.getUser().getId())) {
+            User user = userDao.getUserById(portfolioDTO.getUserId())
+                    .orElseThrow(() -> new RuntimeException("User not found with ID: " + portfolioDTO.getUserId()));
+            existingPortfolio.setUser(user);
+        }
+
+        // Save the updated portfolio entity
+        Portfolio updatedPortfolio = portfolioRepository.save(existingPortfolio);
+
+        // Convert the updated portfolio entity to DTO and return
+        PortfolioDTO updatedPortfolioDTO = new PortfolioDTO();
+        updatedPortfolioDTO.setId(updatedPortfolio.getId());
+        updatedPortfolioDTO.setName(updatedPortfolio.getName());
+        updatedPortfolioDTO.setDescription(updatedPortfolio.getDescription());
+        updatedPortfolioDTO.setUserId(updatedPortfolio.getUser().getId());
+
+        return updatedPortfolioDTO;
     }
 
     @Override
-    public void deleteById(Long id) {
+    public void deletePortfolio(Long portfolioId) {
+
+        // Check if the portfolio exists
+        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+                .orElseThrow(() -> new RuntimeException("Portfolio not found with ID: " + portfolioId));
+
+        // Perform any necessary cleanup or checks before deletion
+        // For example, check if the portfolio has any associated transactions or holdings
+        // that should be handled in a specific way before the portfolio can be deleted.
+
+        // Delete the portfolio
+        portfolioRepository.delete(portfolio);
+
+        // Optionally, you can also return a confirmation message or status
 
     }
 
@@ -121,6 +159,7 @@ public class PortfolioServiceImpl implements PortfolioService {
     public PortfolioDTO updateDetails(Long id, PortfolioDTO portfolioDTO) {
         return null;
     }
+
 
     @Override
     @Transactional
@@ -131,37 +170,50 @@ public class PortfolioServiceImpl implements PortfolioService {
         List<Transaction> newTransactions = convertDTOsToTransactions(portfolioId, transactionDTOs);
         portfolio.getTransactions().addAll(newTransactions);
 
-
-    //We're computing Holdings on the fly now. so we might have to hold off this for a while.
-//        for (TransactionDTO transactionDTO : transactionDTOs) {
-//            try {
-//                AssetType assetType = AssetType.valueOf(transactionDTO.getAssetType());
-//                switch (assetType) {
-//                    case SECURITY:
-//                        logger.info("Yes the asset type is a Security");
-//                        List<Holding> newHoldings = convertTransactionDTOsToHoldings(transactionDTOs);
-//                        portfolio.getHoldings().addAll(newHoldings);
-//                        break;
-//                    case CASH:
-//                        logger.info("Yes the asset type is a Cash");
-//                        break;
-//                    default:
-//                        // If the asset type is known but not handled, you can add additional cases.
-//                        logger.info("Asset type is known but not handled in this switch case");
-//                        break;
-//                }
-//            } catch (IllegalArgumentException e) {
-//                // This block will catch the exception thrown by valueOf if the asset type is not valid.
-//                throw new IllegalArgumentException("Unknown asset type: " + transactionDTO.getAssetType());
-//            }
-//        }
-
-
-
         // Convert the updated portfolio to DTO and return
         portfolioRepository.save(portfolio);
         return convertToDTO(portfolio);
     }
+//    @Override
+//    @Transactional
+//    public PortfolioDTO addTransactions(Long portfolioId, List<TransactionDTO> transactionDTOs) {
+//        Portfolio portfolio = portfolioRepository.findById(portfolioId)
+//                .orElseThrow(() -> new RuntimeException("Portfolio not found with ID: " + portfolioId));
+//
+//        List<Transaction> newTransactions = convertDTOsToTransactions(portfolioId, transactionDTOs);
+//        portfolio.getTransactions().addAll(newTransactions);
+//
+//
+//    //We're computing Holdings on the fly now. so we might have to hold off this for a while.
+////        for (TransactionDTO transactionDTO : transactionDTOs) {
+////            try {
+////                AssetType assetType = AssetType.valueOf(transactionDTO.getAssetType());
+////                switch (assetType) {
+////                    case SECURITY:
+////                        logger.info("Yes the asset type is a Security");
+////                        List<Holding> newHoldings = convertTransactionDTOsToHoldings(transactionDTOs);
+////                        portfolio.getHoldings().addAll(newHoldings);
+////                        break;
+////                    case CASH:
+////                        logger.info("Yes the asset type is a Cash");
+////                        break;
+////                    default:
+////                        // If the asset type is known but not handled, you can add additional cases.
+////                        logger.info("Asset type is known but not handled in this switch case");
+////                        break;
+////                }
+////            } catch (IllegalArgumentException e) {
+////                // This block will catch the exception thrown by valueOf if the asset type is not valid.
+////                throw new IllegalArgumentException("Unknown asset type: " + transactionDTO.getAssetType());
+////            }
+////        }
+//
+//
+//
+//        // Convert the updated portfolio to DTO and return
+//        portfolioRepository.save(portfolio);
+//        return convertToDTO(portfolio);
+//    }
 
 
 
@@ -459,33 +511,6 @@ public class PortfolioServiceImpl implements PortfolioService {
 
         return holdings;
     }
-
-
-    //Compute the value for a given holding.
-//    public List<HoldingDTO> updateHoldingsWithCurrentValues(List<HoldingDTO> holdings) {
-//        for (HoldingDTO holding : holdings) {
-//            // Step 1: Retrieve the current price for the security
-//            double currentPrice = stockPriceService.getCurrentPrice(holding.getSymbol());
-//
-//            // Step 2: Calculate the current value
-//            double currentValue = currentPrice * holding.getQuantity();
-//
-//            // Step 3: Calculate the original value
-//            double originalValue = holding.getAveragePrice() * holding.getQuantity();
-//
-//            // Step 4: Determine profit/loss
-//            double profitLoss = currentValue - originalValue;
-//
-//            // Step 5: Calculate profit/loss percentage
-//            double profitLossPercentage = (profitLoss / originalValue) * 100;
-//
-//            // Update the HoldingDTO with the new information
-//            holding.setCurrentValue(currentValue);
-//            holding.setProfitLoss(profitLoss);
-//            holding.setProfitLossPercentage(profitLossPercentage);
-//        }
-//        return holdings;
-//    }
 
 
 
