@@ -187,8 +187,8 @@ public class PortfolioServiceImpl implements PortfolioService {
             // ...
         }
 
-        // Save the updated holding
-        holdingRepository.save(holding);
+//        // Save the updated holding
+//        holdingRepository.save(holding);
 
         // Remove the transaction
         transactionRepository.delete(transaction);
@@ -386,16 +386,16 @@ public class PortfolioServiceImpl implements PortfolioService {
         return holdings;
     }
 
-    //Compute a list of holdings on the fly.
     private List<HoldingDTO> calculateHoldings(List<Transaction> transactions) {
-        // Filter transactions by asset type 'SECURITY'
-        List<Transaction> securityTransactions = transactions.stream()
-                .filter(t -> AssetType.SECURITY.equals(t.getAssetType()))
-                .collect(Collectors.toList());
 
         // Filter transactions by Cash asset type
         List<Transaction> cashTransactions = transactions.stream()
                 .filter(t -> AssetType.CASH.equals(t.getAssetType()))
+                .collect(Collectors.toList());
+
+        // Filter transactions by asset type 'SECURITY'
+        List<Transaction> securityTransactions = transactions.stream()
+                .filter(t -> AssetType.SECURITY.equals(t.getAssetType()))
                 .collect(Collectors.toList());
 
         // Group transactions by symbol
@@ -425,9 +425,33 @@ public class PortfolioServiceImpl implements PortfolioService {
                 HoldingDTO holding = new HoldingDTO();
                 holding.setSymbol(symbol);
                 holding.setQuantity(totalShares);
-                // Calculate the average price based on the total cost and total shares
                 double averagePrice = totalCost / totalShares;
                 holding.setAveragePrice(averagePrice);
+
+                // Fetch the current price for the stock
+                String financialDataJson = twelveDataService.fetchCompanyFundamentals(symbol);
+                double currentPrice = 0;
+                try {
+                    JSONObject financialData = new JSONObject(financialDataJson);
+
+                    // Extracting current price
+                    if (financialData.has("close")) {
+                        currentPrice = financialData.getDouble("close");
+                    }
+                } catch (JSONException e) {
+                    System.err.println("Error parsing JSON for stock: " + symbol);
+                    e.printStackTrace();
+                }
+
+                // Calculate the current value and profit/loss
+                double currentValue = currentPrice * totalShares;
+                double profitLoss = currentValue - totalCost;
+                double profitLossPercentage = (profitLoss / totalCost) * 100;
+
+                // Update the HoldingDTO with the new information
+                holding.setCurrentValue(currentValue);
+                holding.setProfitLoss(profitLoss);
+                holding.setProfitLossPercentage(profitLossPercentage);
 
                 holdings.add(holding);
             }
@@ -435,6 +459,34 @@ public class PortfolioServiceImpl implements PortfolioService {
 
         return holdings;
     }
+
+
+    //Compute the value for a given holding.
+//    public List<HoldingDTO> updateHoldingsWithCurrentValues(List<HoldingDTO> holdings) {
+//        for (HoldingDTO holding : holdings) {
+//            // Step 1: Retrieve the current price for the security
+//            double currentPrice = stockPriceService.getCurrentPrice(holding.getSymbol());
+//
+//            // Step 2: Calculate the current value
+//            double currentValue = currentPrice * holding.getQuantity();
+//
+//            // Step 3: Calculate the original value
+//            double originalValue = holding.getAveragePrice() * holding.getQuantity();
+//
+//            // Step 4: Determine profit/loss
+//            double profitLoss = currentValue - originalValue;
+//
+//            // Step 5: Calculate profit/loss percentage
+//            double profitLossPercentage = (profitLoss / originalValue) * 100;
+//
+//            // Update the HoldingDTO with the new information
+//            holding.setCurrentValue(currentValue);
+//            holding.setProfitLoss(profitLoss);
+//            holding.setProfitLossPercentage(profitLossPercentage);
+//        }
+//        return holdings;
+//    }
+
 
 
 
