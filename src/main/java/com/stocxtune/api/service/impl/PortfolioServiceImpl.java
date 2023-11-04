@@ -3,10 +3,8 @@ package com.stocxtune.api.service.impl;
 import com.stocxtune.api.dao.UserDao;
 import com.stocxtune.api.dto.HoldingDTO;
 import com.stocxtune.api.dto.PortfolioDTO;
-import com.stocxtune.api.dto.StockDTO;
 import com.stocxtune.api.dto.TransactionDTO;
 import com.stocxtune.api.model.*;
-import com.stocxtune.api.model.stock.Stock;
 import com.stocxtune.api.enums.TransactionEnums.AssetType;
 import com.stocxtune.api.enums.TransactionEnums.TransactionType;
 
@@ -84,13 +82,8 @@ public class PortfolioServiceImpl implements PortfolioService {
     }
 
     @Override
-    public PortfolioDTO findById(Long id) {
-        return null;
-    }
-
-    @Override
-    public List<PortfolioDTO> findAll() {
-        return null;
+    public Optional<Portfolio> findById(Long id) {
+        return portfolioRepository.findById(id);
     }
 
     @Override
@@ -100,11 +93,6 @@ public class PortfolioServiceImpl implements PortfolioService {
         return portfolio.stream()
                 .map(this::convertToDTO)  // Assuming you have a method called convertToDTO
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<PortfolioDTO> getPortfolioByUserEmail(String email) {
-        return null;
     }
 
     @Override
@@ -155,10 +143,6 @@ public class PortfolioServiceImpl implements PortfolioService {
 
     }
 
-    @Override
-    public PortfolioDTO updateDetails(Long id, PortfolioDTO portfolioDTO) {
-        return null;
-    }
 
 
     @Override
@@ -292,27 +276,6 @@ public class PortfolioServiceImpl implements PortfolioService {
         return updatedTransactionDTO;
     }
 
-
-    @Override
-    public PortfolioDTO removeTransactions(Long id, List<Long> transactionIds) {
-        return null;
-    }
-
-    @Override
-    public PortfolioDTO addHoldings(Long id, List<HoldingDTO> holdings) {
-        return null;
-    }
-
-    @Override
-    public PortfolioDTO removeHoldings(Long id, List<Long> holdingIds) {
-        return null;
-    }
-
-    @Override
-    public PortfolioDTO updateHolding(Long portfolioId, Long holdingId, HoldingDTO holdingDTO) {
-        return null;
-    }
-
     @Override
     public List<HoldingDTO> getHoldingsByPortfolioId(Long portfolioId) {
         // Retrieve transactions related to the portfolio
@@ -325,16 +288,6 @@ public class PortfolioServiceImpl implements PortfolioService {
         // Return the list of HoldingDTOs
         return holdings;
     }
-
-    @Override
-    public PortfolioDTO removeHolding(Long portfolioId, Long holdingId) {
-        return null;
-    }
-
-//    @Override
-//    public PortfolioDTO removeTransaction(Long portfolioId, Long transactionId) {
-//        return null;
-//    }
 
 
     // Helper Methods.
@@ -542,8 +495,4 @@ public class PortfolioServiceImpl implements PortfolioService {
 
         return holdings;
     }
-
-
-
-
 }

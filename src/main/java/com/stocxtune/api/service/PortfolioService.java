@@ -3,9 +3,11 @@ package com.stocxtune.api.service;
 import com.stocxtune.api.dto.HoldingDTO;
 import com.stocxtune.api.dto.PortfolioDTO;
 import com.stocxtune.api.dto.TransactionDTO;
+import com.stocxtune.api.model.Portfolio;
 import org.springframework.cache.annotation.Cacheable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface PortfolioService {
 
@@ -13,15 +15,11 @@ public interface PortfolioService {
     PortfolioDTO save(PortfolioDTO portfolioDTO);
 
     @Cacheable(value = "findPortfolioByID")
-    PortfolioDTO findById(Long id);
-
-    @Cacheable(value = "findAllPortfolios")
-    List<PortfolioDTO> findAll();
+    Optional<Portfolio> findById(Long id);
 
     List<PortfolioDTO> findAllByUserId(Long userId);
 
-    @Cacheable(value = "getPortfolioByUserEmail")
-    List<PortfolioDTO> getPortfolioByUserEmail(String email);
+
 
     @Cacheable(value = "updatePortfolio")
     PortfolioDTO updatePortfolio(Long id, PortfolioDTO portfolioDTO);
@@ -29,39 +27,14 @@ public interface PortfolioService {
     @Cacheable(value = "deletePortfolio")
     void deletePortfolio(Long id);
 
-    PortfolioDTO updateDetails(Long id, PortfolioDTO portfolioDTO);
-
+    /**
+     * Adds transactions to a specific portfolio.
+     *
+     * @param id The ID of the portfolio.
+     * @param transactions The list of holdings to add.
+     * @return The updated portfolio.
+     */
     PortfolioDTO addTransactions(Long id, List<TransactionDTO> transactions);
-
-    PortfolioDTO removeTransactions(Long id, List<Long> transactionIds);
-
-    /**
-     * Adds holdings to a specific portfolio.
-     *
-     * @param id The ID of the portfolio.
-     * @param holdings The list of holdings to add.
-     * @return The updated portfolio.
-     */
-    PortfolioDTO addHoldings(Long id, List<HoldingDTO> holdings);
-
-    /**
-     * Removes holdings from a specific portfolio.
-     *
-     * @param id The ID of the portfolio.
-     * @param holdingIds The list of holding IDs to remove.
-     * @return The updated portfolio.
-     */
-    PortfolioDTO removeHoldings(Long id, List<Long> holdingIds);
-
-    /**
-     * Updates a specific holding in a portfolio.
-     *
-     * @param portfolioId The ID of the portfolio.
-     * @param holdingId The ID of the holding to update.
-     * @param holdingDTO The updated holding data.
-     * @return The updated portfolio.
-     */
-    PortfolioDTO updateHolding(Long portfolioId, Long holdingId, HoldingDTO holdingDTO);
 
     /**
      * Fetches all holdings for a specific portfolio.
@@ -71,9 +44,14 @@ public interface PortfolioService {
     @Cacheable(value = "getHoldingsByPortfolioId")
     List<HoldingDTO> getHoldingsByPortfolioId(Long portfolioId);
 
+    /**
+     * Updates a specific holding in a portfolio.
+     *
+     * @param transactionId The ID of the portfolio.
+     * @param transactionDTO The ID of the holding to update.
+     * @return The updated portfolio.
+     */
     TransactionDTO updateTransaction(Long transactionId, TransactionDTO transactionDTO);
-
-    PortfolioDTO removeHolding(Long portfolioId, Long holdingId);
 
     PortfolioDTO removeTransaction(Long portfolioId, Long transactionId);
 

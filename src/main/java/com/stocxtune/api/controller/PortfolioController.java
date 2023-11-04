@@ -4,6 +4,7 @@ import com.stocxtune.api.dao.UserDao;
 import com.stocxtune.api.dto.HoldingDTO;
 import com.stocxtune.api.dto.PortfolioDTO;
 import com.stocxtune.api.dto.TransactionDTO;
+import com.stocxtune.api.model.Portfolio;
 import com.stocxtune.api.model.User;
 import com.stocxtune.api.security.services.UserDetailsImpl;
 import com.stocxtune.api.service.PortfolioService;
@@ -14,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/portfolios")
@@ -61,7 +63,7 @@ public class PortfolioController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PortfolioDTO> getPortfolio(@PathVariable Long id) {
+    public ResponseEntity<Optional<Portfolio>> getPortfolio(@PathVariable Long id) {
         return ResponseEntity.ok(portfolioService.findById(id));
     }
 
@@ -78,16 +80,6 @@ public class PortfolioController {
 
     // Holdings Endpoints:
 
-    @PostMapping("/{id}/holdings")
-    public ResponseEntity<PortfolioDTO> addHoldings(@PathVariable Long id, @RequestBody List<HoldingDTO> holdings) {
-        return ResponseEntity.ok(portfolioService.addHoldings(id, holdings));
-    }
-
-    @DeleteMapping("/{portfolioId}/holdings/{holdingId}")
-    public ResponseEntity<PortfolioDTO> removeHolding(@PathVariable Long portfolioId, @PathVariable Long holdingId) {
-        // Assuming you'll modify the service to handle removal of a single holding by its ID
-        return ResponseEntity.ok(portfolioService.removeHolding(portfolioId, holdingId));
-    }
 
     @GetMapping("/{id}/holdings")
     public ResponseEntity<List<HoldingDTO>> getHoldingsByPortfolioId(@PathVariable Long id) {
