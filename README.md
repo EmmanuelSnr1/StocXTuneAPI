@@ -27,4 +27,10 @@ Technologies:
   - 
 - Debug transaction Service 
   - Make sure additional fields added in the front end are included in the transaction service. 
-  - 
+
+
+# To Learn 
+- Integration Unit testing. 
+- Unit mock testing 
+- Java 8 Streams API
+- Test Coverages

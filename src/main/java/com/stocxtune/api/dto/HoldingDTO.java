@@ -17,6 +17,12 @@ public class HoldingDTO {
     private Double quantity;
     private Double averagePrice;
     private Double cashValue;
+    private Double currentValue;
+    private Double profitLoss;
+    private Double profitLossPercentage;
+
+
+
 
     // Other attributes as needed...
 }
