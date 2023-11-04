@@ -19,7 +19,7 @@ public class PortfolioServiceIntegrationTest {
     private PortfolioService portfolioService;
 
     @Test
-    public void testGetHoldingsByPortfolioId() {
+     public void testGetHoldingsByPortfolioId() {
         // Given
         Long portfolioId = 6L; // Make sure this ID exists in your test database
 
