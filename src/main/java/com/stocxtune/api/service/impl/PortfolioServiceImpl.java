@@ -337,6 +337,7 @@ public class PortfolioServiceImpl implements PortfolioService {
 
         return dto;
     }
+    //not currently being used
     private List<Holding> convertTransactionDTOsToHoldings(List<TransactionDTO> transactionDTOs) {
         if (transactionDTOs == null) {
             return Collections.emptyList();
@@ -385,11 +386,16 @@ public class PortfolioServiceImpl implements PortfolioService {
         return holdings;
     }
 
-
+    //Compute a list of holdings on the fly.
     private List<HoldingDTO> calculateHoldings(List<Transaction> transactions) {
         // Filter transactions by asset type 'SECURITY'
         List<Transaction> securityTransactions = transactions.stream()
                 .filter(t -> AssetType.SECURITY.equals(t.getAssetType()))
+                .collect(Collectors.toList());
+
+        // Filter transactions by Cash asset type
+        List<Transaction> cashTransactions = transactions.stream()
+                .filter(t -> AssetType.CASH.equals(t.getAssetType()))
                 .collect(Collectors.toList());
 
         // Group transactions by symbol

@@ -20,9 +20,11 @@ Technologies:
 - General 
   - Clean up portfolio Service Implementation service.
 - Debug holdings
-  - Fix holdings method when creating a transaction. 
-  - Test holdings controller to see if holdings are properly fetched from the database. 
-  - Fix convertTransactionDTOsToHoldings method. 
+  - Fix holdings method when creating a transaction. - Done 
+  - Test holdings controller to see if holdings are properly fetched from the database. - Done 
+  - Fix convertTransactionDTOsToHoldings method. - Done
+  - Modify calculate holdings to include cash holdings as well. 
+  - 
 - Debug transaction Service 
   - Make sure additional fields added in the front end are included in the transaction service. 
   - 
