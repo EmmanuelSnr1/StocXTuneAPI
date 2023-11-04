@@ -1,5 +1,6 @@
 package com.stocxtune.api.dto;
 
+import com.stocxtune.api.model.Portfolio;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ public class TransactionDTO {
     private String symbol;
     private Date date;
     private String transactionType; // Using String for simplicity
+    private Portfolio portfolio;
     private Double shares;
     private Double price;
     private Double fees;

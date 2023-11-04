@@ -250,17 +250,48 @@ public class PortfolioServiceImpl implements PortfolioService {
         return updatedPortfolioDTO;
     }
 
+    //Untested. Dont think its really important but it will do at the moment.
+    @Override
+    @Transactional
+    public TransactionDTO updateTransaction(Long transactionId, TransactionDTO transactionDTO) {
+        // Retrieve the existing Transaction entity
+        Transaction existingTransaction = transactionRepository.findById(transactionId)
+                .orElseThrow(() -> new RuntimeException("Transaction not found with ID: " + transactionId));
 
+        // Update the existing Transaction entity with values from the DTO
+        existingTransaction.setDate(transactionDTO.getDate());
+        existingTransaction.setSymbol(transactionDTO.getSymbol());
+        existingTransaction.setShares(transactionDTO.getShares());
+        existingTransaction.setPrice(transactionDTO.getPrice());
+        existingTransaction.setFees(transactionDTO.getFees());
+        existingTransaction.setAssetType(AssetType.valueOf(transactionDTO.getAssetType()));
+        existingTransaction.setTransactionType(TransactionType.valueOf(transactionDTO.getTransactionType()));
 
+        // If the portfolio ID is being updated, fetch the new portfolio and set it
+        if (transactionDTO.getPortfolio() != null && !transactionDTO.getPortfolio().equals(existingTransaction.getPortfolio())) {
+            Portfolio portfolio = portfolioRepository.findById(transactionDTO.getPortfolio().getId())
+                    .orElseThrow(() -> new RuntimeException("Portfolio not found with ID: " + transactionDTO.getPortfolio().getId()));
+            existingTransaction.setPortfolio(portfolio);
+        }
 
+        // Save the updated transaction entity
+        Transaction updatedTransaction = transactionRepository.save(existingTransaction);
 
+        // Convert the updated transaction entity to DTO and return
+        TransactionDTO updatedTransactionDTO = new TransactionDTO();
+        updatedTransactionDTO.setId(updatedTransaction.getId());
+        updatedTransactionDTO.setDate(updatedTransaction.getDate());
+        updatedTransactionDTO.setSymbol(updatedTransaction.getSymbol());
+        updatedTransactionDTO.setShares(updatedTransaction.getShares());
+        updatedTransactionDTO.setPrice(updatedTransaction.getPrice());
+        updatedTransactionDTO.setFees(updatedTransaction.getFees());
+        updatedTransactionDTO.setAssetType(updatedTransaction.getAssetType().toString());
+        updatedTransactionDTO.setTransactionType(updatedTransaction.getTransactionType().toString());
+        updatedTransactionDTO.setPortfolio(updatedTransaction.getPortfolio());
 
+        return updatedTransactionDTO;
+    }
 
-
-//    @Override
-//    public PortfolioDTO addTransactions(Long id, List<TransactionDTO> transactions) {
-//        return null;
-//    }
 
     @Override
     public PortfolioDTO removeTransactions(Long id, List<Long> transactionIds) {

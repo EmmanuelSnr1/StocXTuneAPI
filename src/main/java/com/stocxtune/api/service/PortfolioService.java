@@ -71,6 +71,8 @@ public interface PortfolioService {
     @Cacheable(value = "getHoldingsByPortfolioId")
     List<HoldingDTO> getHoldingsByPortfolioId(Long portfolioId);
 
+    TransactionDTO updateTransaction(Long transactionId, TransactionDTO transactionDTO);
+
     PortfolioDTO removeHolding(Long portfolioId, Long holdingId);
 
     PortfolioDTO removeTransaction(Long portfolioId, Long transactionId);
