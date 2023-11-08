@@ -25,7 +25,15 @@ Technologies:
   - Fix convertTransactionDTOsToHoldings method. - Done
   - Modify calculate holdings to include cash holdings as well. 
   - Make holdings to be computed on the fly from now onwards
+  - Add a property that can also be computed on the fly. 
+    - Portfolio value 
+    - Cash Value
+    - Net profit
+    - Net Loss
+  - Figure out how to compute details corresponding to time (I.e., portfolio performance over time)
   - 
+
+
 - Debug transaction Service 
   - Make sure additional fields added in the front end are included in the transaction service. 
 
