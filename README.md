@@ -49,4 +49,6 @@ Technologies:
 - Java 8 Streams API
 - Test Coverages
 - How to create data science plugins to a Springboot app. 
-- List and map data structures. 
+- List and map data structures.
+- Editable PDF with useful java cheat sheet. 
+- 
