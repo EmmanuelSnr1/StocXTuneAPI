@@ -18,7 +18,9 @@ Technologies:
 
 # TODO 
 - General 
-  - Clean up portfolio Service Implementation service.
+  - Clean up portfolio Service Implementation service - Done.
+  - Thinking of moving functions with similar purposes into a single file then called whenever.
+  - Clean up of portfolio controller to clear up unwanted methods. 
 - Debug holdings
   - Fix holdings method when creating a transaction. - Done 
   - Test holdings controller to see if holdings are properly fetched from the database. - Done 
@@ -31,7 +33,6 @@ Technologies:
     - Net profit
     - Net Loss
   - Figure out how to compute details corresponding to time (I.e., portfolio performance over time)
-  - 
 
 
 - Debug transaction Service 
