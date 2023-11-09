@@ -34,6 +34,10 @@ Technologies:
     - Net Loss
   - Figure out how to compute details corresponding to time (I.e., portfolio performance over time)
 
+- Nice to have
+  - High performance logic. i.e., calculation of portfolio Meta values on the fly could use Maps instead of lists. 
+  - User Details Management 
+  - Media consolidation
 
 - Debug transaction Service 
   - Make sure additional fields added in the front end are included in the transaction service. 
@@ -44,3 +48,5 @@ Technologies:
 - Unit mock testing 
 - Java 8 Streams API
 - Test Coverages
+- How to create data science plugins to a Springboot app. 
+- List and map data structures. 
