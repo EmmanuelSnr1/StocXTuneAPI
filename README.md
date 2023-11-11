@@ -38,6 +38,8 @@ Technologies:
   - High performance logic. i.e., calculation of portfolio Meta values on the fly could use Maps instead of lists. 
   - User Details Management 
   - Media consolidation
+  - Data exports
+  - 
 
 - Debug transaction Service 
   - Make sure additional fields added in the front end are included in the transaction service. 
