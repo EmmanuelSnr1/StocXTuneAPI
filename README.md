@@ -21,6 +21,7 @@ Technologies:
   - Clean up portfolio Service Implementation service - Done.
   - Thinking of moving functions with similar purposes into a single file then called whenever.
   - Clean up of portfolio controller to clear up unwanted methods. 
+  - 
 - Debug holdings
   - Fix holdings method when creating a transaction. - Done 
   - Test holdings controller to see if holdings are properly fetched from the database. - Done 
@@ -39,6 +40,11 @@ Technologies:
   - User Details Management 
   - Media consolidation
   - Data exports
+    - Pdfs - Presentation
+    - CSVs 
+    - Spreadsheets 
+    - 
+    - 
   - 
 
 - Debug transaction Service 
