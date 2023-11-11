@@ -35,10 +35,11 @@ Technologies:
     - Net profit
     - Net Loss
   - Figure out how to compute details corresponding to time (I.e., portfolio performance over time)
+- 
 
 - Nice to have
   - High performance logic. i.e., calculation of portfolio Meta values on the fly could use Maps instead of lists. 
-  - User Details Management 
+  - User Profile Management 
   - Media consolidation
   - Data exports
     - Pdfs - Presentation
