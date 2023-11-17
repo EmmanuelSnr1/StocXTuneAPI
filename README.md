@@ -59,4 +59,4 @@ Technologies:
 - How to create data science plugins to a Springboot app. 
 - List and map data structures.
 - Editable PDF with useful java cheat sheet. 
-- 
+- Project Based learning with Java
