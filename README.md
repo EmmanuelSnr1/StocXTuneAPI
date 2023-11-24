@@ -61,5 +61,4 @@ Technologies:
 - List and map data structures.
 - Editable PDF with useful java cheat sheet. 
 - Project Based learning with Java
-
-- 
+- Find a course on Testing in Java. 
