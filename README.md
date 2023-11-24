@@ -23,6 +23,7 @@ Technologies:
   - Clean up of portfolio controller to clear up unwanted methods. 
   - Data visualization for portfolio 
   - Analytics
+  - - Update trello board with java tasks
 - Debug holdings
   - Fix holdings method when creating a transaction. - Done 
   - Test holdings controller to see if holdings are properly fetched from the database. - Done 
@@ -60,3 +61,5 @@ Technologies:
 - List and map data structures.
 - Editable PDF with useful java cheat sheet. 
 - Project Based learning with Java
+
+- 
