@@ -35,6 +35,7 @@ Technologies:
     - Cash Value
     - Net profit
     - Net Loss
+    - Figure out a way to plot the portfolios performance on a graph
   - Figure out how to compute details corresponding to time (I.e., portfolio performance over time)
 - 
 
