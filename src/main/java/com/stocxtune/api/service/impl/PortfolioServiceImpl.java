@@ -373,7 +373,9 @@ public class PortfolioServiceImpl implements PortfolioService {
 
         return dto;
     }
-    //not currently being used
+
+
+    //not currently being used Thinking of removing it
     private List<Holding> convertTransactionDTOsToHoldings(List<TransactionDTO> transactionDTOs) {
         if (transactionDTOs == null) {
             return Collections.emptyList();
