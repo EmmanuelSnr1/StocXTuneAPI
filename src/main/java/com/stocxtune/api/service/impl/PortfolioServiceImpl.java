@@ -183,8 +183,6 @@ public class PortfolioServiceImpl implements PortfolioService {
             // ...
         }
 
-//        // Save the updated holding
-//        holdingRepository.save(holding);
 
         // Remove the transaction
         transactionRepository.delete(transaction);
