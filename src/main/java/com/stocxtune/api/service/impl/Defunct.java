@@ -1,6 +1,7 @@
 package com.stocxtune.api.service.impl;
 
 public class Defunct {
+//    Contains all defunct methods and functions
 
     //    @Override
 //    @Transactional
