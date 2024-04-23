@@ -38,7 +38,7 @@ Technologies:
     - Net Loss
     - Figure out a way to plot the portfolios performance on a graph
   - Figure out how to compute details corresponding to time (I.e., portfolio performance over time)
-- Making Use of Nulab account for projecy management 
+- Making Use of Nulab account for project management 
 
 - Nice to have
   - High performance logic. i.e., calculation of portfolio Meta values on the fly could use Maps instead of lists. 
