@@ -64,3 +64,20 @@ Technologies:
 - Editable PDF with useful java cheat sheet. 
 - Project Based learning with Java
 - Find a course on Testing in Java. https://java-programming.mooc.fi/part-6/3-introduction-to-testing 
+
+
+Notes on setting up mysql.
+- Install Mysql https://dev.mysql.com/doc/refman/8.3/en/macos-installation-pkg.html
+- after installation, setup a default user named "root"
+- Use brew install on MAC /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+- run brew install mysql
+- brew services start mysql
+- mysql_secure_installation (optional)
+- To start the shell, run mysql -u root -p
+- create the database by running:
+  CREATE DATABASE smpm;
+  CREATE USER 'root'@'localhost' IDENTIFIED BY 'Gloryv31';
+  GRANT ALL PRIVILEGES ON smpm.* TO 'root'@'localhost';
+  FLUSH PRIVILEGES;
+
+
