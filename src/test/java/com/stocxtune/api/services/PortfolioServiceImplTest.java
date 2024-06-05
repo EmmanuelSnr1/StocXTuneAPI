@@ -35,6 +35,16 @@ class PortfolioServiceImplTest {
         MockitoAnnotations.openMocks(this);
     }
 
+
+    @Test
+    public void justLearntUnitTesting(){
+
+        int a = 1;
+        int b = 2;
+        System.out.println("This is brilliant " + (a+b));
+        System.out.println("If i knew this earlier, my life wouldnt have been that bad ");
+
+    }
     @Test
     void testSave() {
         // Given
